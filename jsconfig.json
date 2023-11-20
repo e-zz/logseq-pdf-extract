@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "checkJs": true,
+        "moduleResolution":"node",
+    },
+    "typeAcquisition": {
+        "include": [
+            "./node_modules/@logseq/libs/index.d.ts",
+            "./src/typings/"
+        ]
+    }
+}
