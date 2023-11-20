@@ -1,0 +1,64 @@
+::root {
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+}
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#app .container-wrap {
+  color: #2c3e50;
+  background-color: rgba(57, 57, 57, 0.01);
+}
+
+.container-wrap {
+  width: 100%;
+  height: 80%;
+  position: absolute;
+}
+
+.container-inner {
+  background-color: var(--ls-primary-background-color,#fff);
+  position: absolute;
+  border-color: var(--gray-100);
+  border-radius: .375rem;
+}
+
+.container-inner ._opener {
+  padding: 0.5rem 1rem;
+  font-size: 12px;
+}
+
+.container-inner ._opener:hover {
+    cursor: pointer;
+    background-color: var(--ls-menu-hover-color,#f4f5f7);
+}
+
+.shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
+}
+
+#app .container-wrap.lspdark {
+  color: rgb(237, 239, 239);
+}
+
+#app .container-wrap.lspdark .container-inner {
+  background-color: var(--ls-primary-background-color,#000);
+  position: absolute;
+  border-color: var(--gray-800);
+}
+
+
+#app .container-wrap.lspdark .container-inner ._opener:hover {
+  cursor: pointer;
+  background-color: var(--ls-menu-hover-color,#606060);
+}
