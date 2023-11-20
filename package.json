@@ -1,0 +1,25 @@
+{
+  "name": "logseq-pdf-extract",
+  "version": "0.0.6",
+  "main": "dist/index.html",
+  "author": "e-zz",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.9.1",
+    "@logseq/libs": "^0.0.15",
+    "vue": "^3.2.33"
+  },
+  "devDependencies": {
+    "vite": "^2.9.5",
+    "@vitejs/plugin-vue": "2.0.0"
+  },
+  "logseq": {
+    "id": "logseq-pdf-extract",
+    "icon": "./icon.png",
+    "title": "PDF Extract"
+  }
+}
