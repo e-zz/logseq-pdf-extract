@@ -1,5 +1,6 @@
 import '@logseq/libs'
 import { createApp } from 'vue'
+import { changePropsLoad } from './utils/refProps'
 import App from './App.vue'
 import './index.css'
 
@@ -63,45 +64,62 @@ function main() {
 
   // main UI
   createApp(App).mount('#app')
+  
+
+  changePropsLoad();
 }
 
 // bootstrap
 logseq
-  .useSettingsSchema([{
-    key: 'distro',
-    type: 'enum',
-    title: 'URL Scheme',
-    description: 'Open the files in either VS Code Stable, Insiders or VS Codium',
-    default: 'stable',
-    enumChoices: ['stable', 'insiders', 'vs codium'],
-    enumPicker: 'select'
-  }, {
-    key: 'window',
-    type: 'enum',
-    title: 'VS Code Window',
-    description: 'Where do you want to open the page?',
-    default: 'stable',
-    enumChoices: ['Always in a new window', 'Reuse the last active window', 'In the graph folder', 'In the graph folder (as workspace)'],
-    enumPicker: 'select'
-  },
-  {
-    key: 'key_open_line',
+  .useSettingsSchema([
+  // {
+  //   key: 'distro',
+  //   type: 'enum',
+  //   title: 'URL Scheme',
+  //   description: 'Open the files in either VS Code Stable, Insiders or VS Codium',
+  //   default: 'stable',
+  //   enumChoices: ['stable', 'insiders', 'vs codium'],
+  //   enumPicker: 'select'
+  // }, {
+  //   key: 'window',
+  //   type: 'enum',
+  //   title: 'VS Code Window',
+  //   description: 'Where do you want to open the page?',
+  //   default: 'stable',
+  //   enumChoices: ['Always in a new window', 'Reuse the last active window', 'In the graph folder', 'In the graph folder (as workspace)'],
+  //   enumPicker: 'select'
+  // },
+  // {
+  //   key: 'key_convert',
+  //   type: 'string',
+  //   title: 'Shortcut: open current line',
+  //   description: 'Shortcut to Extract the current line (default `ctrl+alt+o`)',
+  //   default: 'mod+alt+o',
+  // },
+  // {
+  //   key: 'key_open_page',
+  //   type: 'string',
+  //   title: 'Shortcut: open current page',
+  //   description: 'Shortcut to Extract the current page (default `ctrl+o`)',
+  //   default: 'mod+o',
+  // },
+  //  {
+  //   key: 'key_open_graph',
+  //   type: 'string',
+  //   title: 'Shortcut: open current graph',
+  //   description: 'Shortcut to Extract the current graph (default `ctrl+shift+o`)',
+  //   default: 'mod+shift+o',
+  // },
+  { key: 'key_convert',
     type: 'string',
-    title: 'Shortcut: open current line',
-    description: 'Shortcut to Extract the current line (default `ctrl+alt+o`)',
-    default: 'mod+alt+o',
+    title: 'Shortcut: invoke conversion of PDF refs in the focused block (or in selected blocks)',
+    description: 'Shortcut to extract text from PDF ref (default `ctrl+alt+i`)',
+    default: 'mod+alt+i',
   },
-  {
-    key: 'key_open_page',
+  { key: 'val_prop',
     type: 'string',
-    title: 'Shortcut: open current page',
-    description: 'Shortcut to Extract the current page (default `ctrl+o`)',
-    default: 'mod+o',
+    title: 'Name of the property to store PDF refs',
+    description: 'Name of the property to store PDF refs (default `pdf-ref`)',
+    default: 'pdf-ref',
   },
-  {
-    key: 'key_open_graph',
-    type: 'string',
-    title: 'Shortcut: open current graph',
-    description: 'Shortcut to Extract the current graph (default `ctrl+shift+o`)',
-    default: 'mod+shift+o',
-  }]).ready(createModel()).then(main)
+  ]).ready(createModel()).then(main)
