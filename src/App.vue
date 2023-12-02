@@ -17,6 +17,8 @@
 const __debug = false;
 
 
+import { getFiles, fuzzySearch } from './utils/locatePDF';
+
 async function getContent(ref_id) {
 
   let ref_block = await logseq.DB.datascriptQuery(
@@ -111,6 +113,15 @@ async function extractEditor() {
   await extractBlock(block);
 }
 
+async function searchPDF() {
+  // const pdf = await logseq.App.showPDFSearch();
+  // Usage
+  getFiles("C:/Users/zhang/biblio/library") // replace with your directory
+    .then(files => fuzzySearch('quantum', files)) // replace with your query
+    .then(results => console.log(results))
+    .catch(err => console.error(err));
+}
+
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
     key: `Open_current_line_in_default_editor`,
@@ -122,7 +133,20 @@ async function registerShortcuts() {
   },
     extractEditor
   );
+
+  logseq.App.registerCommandPalette({
+    key: `Open_current_line_in_default_editor`,
+    label: "Open current line in default editor",
+    keybinding: {
+      binding: 'mod+alt+y',
+      mode: "global",
+    }
+  },
+    searchPDF
+  );
 }
+
+
 
 export default {
   name: "App",
