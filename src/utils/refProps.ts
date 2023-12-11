@@ -1,25 +1,5 @@
 // import { doc, globals } from '../globals/globals';
 
-import { propsChangedObserverInit, propsChangedObserverRun, propsChangedObserverStop } from './propsObserver';
-
-import { refPropEllipsis } from './refPropsCss';
-
-const __debug = false;
-
-export const changePropsLoad = async () => {
-  refPropEllipsis();
-  refProps();
-  propsChangedObserverInit();
-  propsChangedObserverRun();
-  // Route listener
-  logseq.App.onRouteChanged(() => {
-    propsChangedObserverStop();
-    setTimeout(() => {
-      refProps();
-      propsChangedObserverRun();
-    }, 100);
-  });
-}
 
 /*
 export const refProps Unload = () => {
@@ -69,8 +49,8 @@ export const refProps = async (propsKeysList?: HTMLElement[]) => {
   //   return;
   // }
 
-  let doc = top.document;
   if (!propsKeysList) {
+    let doc = top.document;
     propsKeysList = [...doc.querySelectorAll('#app-container .block-properties .page-property-key')] as HTMLElement[];
   }
   if (propsKeysList.length) {

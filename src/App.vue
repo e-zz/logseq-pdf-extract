@@ -17,24 +17,21 @@
 const __debug = false;
 
 
-async function getContent(ref_id) {
+import { buttonFromClipboard } from "./utils/pdfOpenButton"
 
-  let ref_block = await logseq.DB.datascriptQuery(
-    `[:find ?blck
-                :where
-                [?b :block/content ?blck]
-                [?b :block/uuid ?u]
-                [(str ?u) ?s]
-                [(= ?s "${ref_id}")]]
-            ]`
-  );
+async function getContent(ref_id) {
+  let ref_block = await logseq.Editor.getBlock(ref_id);
+  ref_block = ref_block.content;
+  // console.log("in getContent", content);
+
 
   if (__debug) {
     console.log("in getContent", ref_block, ref_block[0]);
     console.log("in getContent", ref_block[0][0].split('\n'));
   }
 
-  let ref_block_cleaned = ref_block[0][0].split('\n');
+  // FIX use regex to get rid of `prop::`
+  let ref_block_cleaned = ref_block.split('\n');
 
   if (__debug) {
     console.log("in getContent", ref_block_cleaned);
@@ -47,16 +44,29 @@ async function getContent(ref_id) {
   return "";
 }
 
+import { getAreaBlockAssetUrl } from "./utils/assets"
+import { ocrFromLocalPath } from "./utils/areaHL"
+
 async function extractRef(uuid) {
   const prop = logseq.settings.val_prop;
+  let ref_block = await logseq.Editor.getBlock(uuid);
   let ref_content = await getContent(uuid);
 
   // cases handling
-  if (ref_content == "" || ref_content == "[:span]") {
+  if (ref_content == "") {
     if (__debug) {
       console.log(`No valid content for ${uuid}`);
     }
     return `((${uuid}))`
+  }
+
+
+  if (ref_content.startsWith("[:span]")) {
+
+
+    // TODO ocr the pic 
+    let pic = getAreaBlockAssetUrl(await logseq.Editor.getBlockProperties(uuid), ref_block.page.id)
+    ocrFromLocalPath(pic)
   }
   // if (__debug) {
   //   console.log("in openCurrentLine ref_content\t", ref_content);
@@ -64,6 +74,7 @@ async function extractRef(uuid) {
   // }
 
   // TODO customize the text format (e.g. add a ">" prefix or something else around the text)
+  // TODO use api instead: prop
   return `\n${prop}:: ((${uuid}))` + '\n> ' + ref_content + '\n\n'
 }
 
@@ -97,7 +108,6 @@ async function extractBlock(block) {
 }
 
 async function extractEditor() {
-  // TODO extract selected blocks
   const blocks = await logseq.Editor.getSelectedBlocks();
   if (blocks?.length > 0) {
     for (let index = 0; index < blocks.length; index++) {
@@ -122,6 +132,31 @@ async function registerShortcuts() {
   },
     extractEditor
   );
+}
+
+
+async function registerSlashCommand() {
+  logseq.Editor.registerSlashCommand(
+    "PDF: insert button from copied PDF",
+    buttonFromClipboard
+  );
+}
+
+async function registerMacro() {
+  logseq.App.onMacroRendererSlotted(async ({ slot, payload }) => {
+    try {
+      let [type, path] = payload.arguments
+      if (type !== ':pdf') return
+      if (!path) path = ""
+
+      await logseq.Editor.updateBlock(payload.uuid, "[:i \"Working..📈..📈.\"]")
+      // let logscores: string = await parseScores(count_total_scores)
+      // await logseq.Editor.updateBlock(payload.uuid, logscores)
+      let zotero = logseq.settings?.zotero;
+      console.log("in zotero", zotero);
+
+    } catch (error) { console.log(error) }
+  })
 }
 
 export default {
@@ -184,6 +219,8 @@ export default {
     // checkCurrentPage();
 
     registerShortcuts();
+    registerMacro();
+    registerSlashCommand();
   },
 
   methods: {

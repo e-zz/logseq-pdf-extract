@@ -1,6 +1,6 @@
 import '@logseq/libs'
 import { createApp } from 'vue'
-import { changePropsLoad } from './utils/refProps'
+import { injectAreaHL, changePropsLoad } from './utils/loadObservers'
 import App from './App.vue'
 import './index.css'
 
@@ -67,6 +67,8 @@ function main() {
   
 
   changePropsLoad();
+  
+  injectAreaHL();
 }
 
 // bootstrap
@@ -122,4 +124,37 @@ logseq
     description: 'Name of the property to store PDF refs (default `pdf-ref`)',
     default: 'pdf-ref',
   },
+  {
+    key: "PDF Root",
+    type: "string",
+    inputAs: "textarea",
+    default: "",
+    title: "PDF Root Folders for `open` Button",
+    description:
+        "Fill in the root folders of your PDF files, separated by comma. For example: /home/user/Documents, C:/Users/Downloads",
+},
+  {
+    key: "HuggingFace User Access Token",
+    type: "string",
+    default: "",
+    title: "HuggingFace User Access Token",
+    description:
+        " Paste your HuggingFace User Access Token. For more information https://huggingface.co/docs/hub/security-tokens",
+},
+//   {
+//     key: "Mathpix Key",
+//     type: "string",
+//     default: "",
+//     title: "Mathpix API Key",
+//     description:
+//         "Paste your Mathpix API Key. For more information https://docs.mathpix.com/#authentication",
+// },
+//   {
+//     key: "Mathpix ID",
+//     type: "string",
+//     default: "",
+//     title: "Mathpix ID",
+//     description:
+//         "",
+// },
   ]).ready(createModel()).then(main)

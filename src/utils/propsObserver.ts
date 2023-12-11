@@ -6,7 +6,7 @@ let doc = top.document;
 let propsChangedObserverConfig: MutationObserverInit;
 let propsChangedObserver: MutationObserver;
 
-export const propsChangedObserverInit = () => {
+export const ObserverInit = () => {
   propsChangedObserverConfig = {
     childList: true,
     subtree: true,
@@ -19,8 +19,10 @@ const propsChangedCallback: MutationCallback = async function (mutationsList) {
     const mutationItem = mutationsList[i];
     const addedNode = mutationItem.addedNodes[0] as HTMLElement;
     if (addedNode && addedNode.childNodes.length) {
+      // 
       const propsKeysList = [...addedNode.querySelectorAll('.block-properties .page-property-key')] as HTMLElement[];
       if (propsKeysList.length) {
+        // TODO check if only the first added node is processed
         refProps(propsKeysList);
         // const currentPage = await logseq.Editor.getCurrentPage();
         // const iconsSetPageName = (globals.pluginConfig.iconsPropsPage as string).toLowerCase();
