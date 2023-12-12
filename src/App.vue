@@ -31,6 +31,7 @@ async function getContent(ref_id) {
   }
 
   // FIX use regex to get rid of `prop::`
+  // following lines assume prop:: only appears at the end of the block 
   let ref_block_cleaned = ref_block.split('\n');
 
   if (__debug) {
@@ -44,45 +45,54 @@ async function getContent(ref_id) {
   return "";
 }
 
-import { getAreaBlockAssetUrl } from "./utils/assets"
-import { ocrFromLocalPath } from "./utils/areaHL"
+// import { getAreaBlockAssetUrl } from "./utils/assets"
+import { readOcr, updateOcr, wrapTex } from "./utils/areaHL"
+
+function formatStyle(excerpt) {
+  const style = logseq.settings.excerpt_style;
+  return style.replace("{{excerpt}}", excerpt);
+}
 
 async function extractRef(uuid) {
-  const prop = logseq.settings.val_prop;
-  let ref_block = await logseq.Editor.getBlock(uuid);
+  // convert a uuid of annotation to wanted format 
   let ref_content = await getContent(uuid);
+  let ref = `((${uuid}))`;
 
   // cases handling
   if (ref_content == "") {
     if (__debug) {
       console.log(`No valid content for ${uuid}`);
     }
-    return `((${uuid}))`
+    return ref
   }
 
-
-  if (ref_content.startsWith("[:span]")) {
-
-
-    // TODO ocr the pic 
-    let pic = getAreaBlockAssetUrl(await logseq.Editor.getBlockProperties(uuid), ref_block.page.id)
-    ocrFromLocalPath(pic)
+  let prop_uuid = "";
+  const prop = logseq.settings.prop_name;
+  if (prop != "") {
+    prop_uuid = `\n${prop}:: ${ref}\n`
   }
-  // if (__debug) {
-  //   console.log("in openCurrentLine ref_content\t", ref_content);
-  //   console.log("in openCurrentLine", `\n${prop}:: ((${uuid}))` + '\n> ' + ref_content + '\n');
+
+  const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
+
+  if (hl_type == "annotation") {
+    return prop_uuid + formatStyle(ref_content)
+  }
+
+  let prop_ocr = await readOcr(uuid);
+  // if (hl_type == "area") {
+  // if (ref_content.startsWith("[:span]")) {
+  if (prop_ocr == "") {
+    prop_ocr = await updateOcr(uuid);
+  }
+  return wrapTex(prop_ocr, uuid)
   // }
-
-  // TODO customize the text format (e.g. add a ">" prefix or something else around the text)
-  // TODO use api instead: prop
-  return `\n${prop}:: ((${uuid}))` + '\n> ' + ref_content + '\n\n'
 }
 
 const pattern_block_ref = /\(\(([\w-]*?)\)\)/g;
 async function extractBlock(block) {
   // TODO Fix: edge cases of reconstruct a block containing ref(s)
   // 1. multiple refs in a block  
-  // 2. ref wrapped by text 
+  // 2. DONE ref surrounded by text 
 
   const block_content = block.content;
   if (__debug) {

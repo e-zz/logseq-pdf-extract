@@ -22,8 +22,8 @@ export async function findFile(fileId) {
 }
 
 
-export async function getAreaBlockAssetUrl(props, page_id) {
-
+export async function getAreaBlockAssetUrl(uuid, page_id) {
+  const props = await logseq.Editor.getBlockProperties(uuid)
   const { id, hlStamp, hlPage } = props;
 
   let file_assets = await findFile(page_id);

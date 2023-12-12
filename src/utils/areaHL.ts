@@ -1,9 +1,21 @@
 
-async function checkTexOCR(uuid) {
+export async function readOcr(uuid) {
   // let content = await logseq.Editor.getBlock(uuid);
   let prop = await logseq.Editor.getBlockProperty(uuid, "ocr")
-  console.log("prop", prop);
-  return prop
+  // console.log("prop", prop);
+  if (!prop) {
+    return ""
+  }
+  return prop.replaceAll("$$", "");
+}
+
+export async function updateOcr(uuid) {
+  // block of uuid must appear on current page
+  const img = top.document.getElementById(`block-content-${uuid}`).querySelector("img");
+  let tex = await ocr(img);
+  // update block ocr:: property 
+  await logseq.Editor.upsertBlockProperty(uuid, "ocr", `$$${tex}$$`);
+  return tex
 }
 
 export async function addOCRButton(mutationItems?: HTMLElement[]) {
@@ -27,6 +39,7 @@ export async function addOCRButton(mutationItems?: HTMLElement[]) {
     button.className = "asset-action-btn px-1";
 
     const _button = actions.querySelector('button').innerHTML;
+    // TODO replace the svg icon
     // // Create an SVG element
     // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     // svg.setAttribute('viewBox', '0 0 100 100'); // Set the viewBox attribute to your SVG content's aspect ratio
@@ -54,28 +67,27 @@ export async function addOCRButton(mutationItems?: HTMLElement[]) {
     button.addEventListener('click', async (e) => {
       e.stopImmediatePropagation();
       // Code to execute when the button is clicked
-      console.log('Button was clicked!');
-      // TODO check if tex is already there
+      // console.log('Button was clicked!');
 
       const divWrapper = e.target.closest("div[data-type='annotation']");
-      console.log("divWrapper", divWrapper);
+      // console.log("divWrapper", divWrapper);
 
       let uuid = divWrapper?.getAttribute("blockid");
-      console.log("uuid", uuid);
-      let tex = await checkTexOCR(uuid);
+      // console.log("uuid", uuid);
 
-      if (tex) {
-        console.log("tex already there")
-        window.focus();
-        // copy TeX to clipboard
-        await navigator.clipboard.writeText(tex);
-      } else {
+      let tex = await readOcr(uuid);
+
+      if (!tex) {
         // perform ocr
-        const img = e.target.parentElement.parentElement.nextElementSibling;
-        tex = await ocr(img);
-        // update block ocr:: property 
-        await logseq.Editor.upsertBlockProperty(uuid, "ocr", tex);
+        // const img = e.target.parentElement.parentElement.nextElementSibling;
+        // tex = await ocr(img);
+        // // update block ocr:: property 
+        // await logseq.Editor.upsertBlockProperty(uuid, "ocr", tex);
+        tex = await updateOcr(uuid);
       }
+      window.focus();
+      // copy TeX to clipboard
+      await navigator.clipboard.writeText(tex);
     });
 
     button.innerHTML = _button;
@@ -95,7 +107,6 @@ async function getTexFromHuggingFace(blob) {
       body: blob,
     }
   );
-
 
   const result = await response.json();
 
@@ -119,38 +130,23 @@ async function getTexFromHuggingFace(blob) {
   return result[0].generated_text;
 }
 
-// async function getTexFromMathpix(blob) {
-//   const base64 = await blobToBase64(blob);
-//   const response = await fetch('https://api.mathpix.com/v3/latex', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'app_id': logseq.settings!["Mathpix ID"],
-//       'app_key': logseq.settings!["Mathpix Key"]
-//     },
-//     body: JSON.stringify({
-//       src: `data:image/png;base64,${base64}`
-//     })
-//   });
+export function wrapTex(t: string, uuid: string) {
+  let texStyle = logseq.settings.area_style;
+  console.log("texStyle", texStyle);
+  console.log("t", t);
 
-//   if (!response.ok) {
-//     throw new Error(`HTTP error! status: ${response.status}`);
-//   }
 
-//   const data = await response.json();
-//   return data.latex;
-// }
+  if (texStyle) {
+    texStyle = texStyle.replace("tex", t);
+    console.log("texStyle 2", texStyle);
 
-// function blobToBase64(blob) {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => resolve(reader.result.split(',')[1]);
-//     reader.onerror = reject;
-//     reader.readAsDataURL(blob);
-//   });
-// }
-function wrapTex(t: string) {
-  // TODO allow users to choose inline tex 
+    if (uuid !== "") {
+      texStyle = texStyle.replace("uuid", uuid);
+      console.log("texStyle 3", texStyle);
+
+    }
+    return texStyle;
+  }
   return "$$" + t + "$$"
 }
 export async function ocr(img) {
@@ -176,23 +172,7 @@ export async function ocr(img) {
   // === OCR
   const tex = await getTexFromHuggingFace(blob);
 
-  // CANCLED mathpix api: no free api calling now (2023-12)
-  // const tex = await getTexFromMathpix(blob);
-
-
-  // const block = await logseq.Editor.getCurrentBlock();
-  // console.log("hlAreas", hlAreas);
-
-  // for (let i = 0; i < hlAreas.length; i++) {
-  //   const hlArea = hlAreas[i];
-
-  //   let action = hlArea.querySelector('span.actions');
-
-  //   if (action) {
-  //     addOCRButton([action]);
-  //   }
-  // }
-  return wrapTex(tex)
+  return tex
 }
 
 // TODO ocr from local path: how to load image from local path

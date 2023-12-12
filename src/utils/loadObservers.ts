@@ -21,19 +21,22 @@ import { ObserverInit, propsChangedObserverRun, propsChangedObserverStop } from 
 import { refPropEllipsis } from './refPropsCss';
 import { refProps } from './refProps';
 
-const __debug = false;
 
 export const changePropsLoad = async () => {
-  refPropEllipsis();
-  refProps();
-  ObserverInit();
-  propsChangedObserverRun();
-  // Route listener
-  logseq.App.onRouteChanged(() => {
-    propsChangedObserverStop();
-    setTimeout(() => {
-      refProps();
-      propsChangedObserverRun();
-    }, 100);
-  });
+  if (logseq.settings.prop_name) {
+
+    refPropEllipsis();
+    refProps();
+    ObserverInit();
+    propsChangedObserverRun();
+
+    logseq.App.onRouteChanged(() => {
+      propsChangedObserverStop();
+      setTimeout(() => {
+        refProps();
+        propsChangedObserverRun();
+      }, 100);
+    });
+
+  }
 }
