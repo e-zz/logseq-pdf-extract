@@ -1,4 +1,4 @@
-import { addOCRButton } from "./areaHL";
+import { addOCRButtonInPage } from "./addOcrButton";
 let doc = top.document;
 let areaChangedObserverConfig: MutationObserverInit;
 let areaChangedObserver: MutationObserver;
@@ -16,9 +16,9 @@ const areaChangedCallback: MutationCallback = async function (mutationsList) {
     const addedNode = mutationsList[i].addedNodes[0] as HTMLElement;
     if (addedNode && addedNode.childNodes.length) {
       // 
-      const areaHighlightList = [...addedNode.querySelectorAll('span.hl-area span.actions')] as HTMLElement[];
+      const areaHighlightList = Array.from(addedNode.querySelectorAll('span.hl-area span.actions')) as HTMLElement[];
       if (areaHighlightList.length) {
-        addOCRButton(areaHighlightList);
+        addOCRButtonInPage(areaHighlightList);
       }
     }
   }
