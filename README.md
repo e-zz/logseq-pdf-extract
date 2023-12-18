@@ -83,6 +83,19 @@ Zotero API
 - MunGell: [ZotServer](https://github.com/MunGell/ZotServer)
 - cboulanger: [excite-docker](https://github.com/cboulanger/excite-docker)
 
+Icon
+- Mcrosoft Bing: [Designer](https://www.bing.com/images/create/)
+
+Coding Assistance
+- GitHub Copilot
+
+
+# Support
+Find this plugin useful? [Buy me a coffee](https://www.buymeacoffee.com/e.zz) ☕️ or you could support my favorite Logseq plugins and their developers. It's also a great help for me. 
+- [debanjandhar12/logseq-anki-sync](https://github.com/debanjandhar12/logseq-anki-sync): I love its idea of inserting backlinks to Logseq blocks. It has significantly enhanced my experience of reviewing and updating cards on Anki mobile.
+-  [haydenull/logseq-plugin-agenda](https://github.com/haydenull/logseq-plugin-agenda): a game changer for my task management.
+
+Both are still under active development.
 
 # Development
 
