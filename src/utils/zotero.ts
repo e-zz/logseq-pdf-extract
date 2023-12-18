@@ -1,5 +1,5 @@
 import { Zapi } from "./zapi"
-
+// import { ZoteroItem } from "./zoteroItem";
 // More customized searches and post-process based on the Zotero API
 
 let __debug = true;
@@ -20,10 +20,13 @@ function itemAttachmentConverter(itemAttachment: any) {
 
 }
 
-function zoteroAttaPathToButton(path: string) {
+function zoteroAttachmentToButton(path: string) {
   return `{{zotero-linked-file "${path.replace("attachments:", "")}"}}`
 }
 
+function zoteroStorageToButton(key: string, path: string) {
+  return `{{zotero-imported-file ${key}, "${path.replace("storage:", "")}"}}`
+}
 export class Zotero {
   static getSelected: any;
   static getRecent: any;
@@ -107,7 +110,9 @@ const wrapTag = (tag: string) => `[[${tag}]]`;
 
 export class zimport {
   // get items selected in Zotero (not Note) with their attachments
+  // item: ZoteroItem;
   item: any;
+
   props: any;
   attachments: any;
   unwantedKeys = [
@@ -122,6 +127,7 @@ export class zimport {
   localLink = (key: any) => `zotero://select/library/items/${key}`;
 
   constructor(item: any) {
+    // this.item = new ZoteroItem(item);
     this.item = item;
     if (__debug) {
       console.log("in zimport \t item to be imported", item);
@@ -129,7 +135,10 @@ export class zimport {
 
   }
 
+
+
   async preImport() {
+    // REFA make preImport a constructor of certain class. Store the converted item
 
 
     // convert this.item to logseq format
@@ -175,8 +184,15 @@ export class zimport {
 
             let attachment = value[key];
             // REFA better way to proecess attachment path. Make it a function or class
-            let baseName = attachment.split('/').pop();
-            attachments.push(`[${baseName}](${this.localLink(key)})` + " " + zoteroAttaPathToButton(attachment));
+            let baseName = attachment.split(/[\/:]/).pop();
+
+            console.log("in preImport \t storage", key, value[key], attachment[0], baseName);
+            if (attachment.startsWith('storage:')) {
+
+              attachments.push(`[${baseName}](${this.localLink(key)})` + " " + zoteroStorageToButton(key, attachment));
+            } else {
+              attachments.push(`[${baseName}](${this.localLink(key)})` + " " + zoteroAttachmentToButton(attachment));
+            }
           }
           break;
         default:
@@ -217,6 +233,8 @@ export class zimport {
 
   async safeImport() {
     // check if the item is already imported. If not, import it.
+    console.log("in safeImport", this.item);
+
     const title = "@" + this.item.title;
     const itemPage = await logseq.Editor.getPage(title);
 
@@ -255,11 +273,21 @@ export async function importSelectedToCursor() {
 
       let insertContent = wrapTag(title) + " ";
       if (selected[i].attachments) {
-        // FIX insert other attachments as a button ?
-        insertContent += zoteroAttaPathToButton(Object.values(selected[i].attachments)[0]);
-      }
+        // REFA zotserver: make attachments as a list of {key: {path: path, type: type}}
 
-      logseq.Editor.insertAtEditingCursor(insertContent);
+        let [firstKey, firstFile] = Object.entries(selected[i].attachments)[0];
+        // TODO allow to choose attachment to be inserted 
+
+
+        if (firstFile.startsWith('storage:')) {
+          // TODO Maybe in ZotServer/selected endpoint, we should keep the type of attachment, like "linked-file" or "imported-file"
+          insertContent += zoteroStorageToButton(firstKey, firstFile);
+        } else {
+          insertContent += zoteroAttachmentToButton(firstFile);
+        }
+
+        logseq.Editor.insertAtEditingCursor(insertContent);
+      }
     }
   }
   else {
