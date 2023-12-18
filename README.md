@@ -42,7 +42,7 @@ Use `Ctrl+Alt+e` to import items selected in Zotero. The items will be imported 
 - [ ] Attachments in Zotero storage 
 - [x] Linked files
 - [ ] Option: turn off the automatic insertion of PDF open buttons while importing
-- [ ] Slash command: `/PDF Extract: import items selected in Zotero`
+- [x] Slash command: `/PDF Extract: import items selected in Zotero`
 
 #### Show Recent Items in Zotero
 To be implemented
