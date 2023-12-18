@@ -56,7 +56,7 @@ Here is how we could use it till now:
 > **How it works and when to use it.**
 Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. But to better support this feature, we need to wait for [this PR](https://github.com/logseq/logseq/pull/10430) to be merged. Before that, this function is no more than a shortcut to copy a button from the item page `@pdf title`.
 
-Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking of reading progress.
+Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking the reading progress.
 
 ## Settings
 #### `excerpt_style`: Template for Annotation Excerpts
