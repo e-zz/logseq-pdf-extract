@@ -14,20 +14,22 @@
 </template>
 
 <script>
-const __debug = false;
+const __debug = true;
 
 
 import { buttonFromClipboard } from "./utils/pdfOpenButton"
+import { readOcr, updateOcr } from "./utils/ocrLib"
+import { importSelectedToCursor, test_zimport } from './utils/zotero'
+import { wrapAreaIdTex } from "./utils/texLib";
 
 async function getContent(ref_id) {
-  let ref_block = await logseq.Editor.getBlock(ref_id);
-  ref_block = ref_block.content;
+  let ref_block = (await logseq.Editor.getBlock(ref_id)).content;
   // console.log("in getContent", content);
 
 
   if (__debug) {
-    console.log("in getContent", ref_block, ref_block[0]);
-    console.log("in getContent", ref_block[0][0].split('\n'));
+    console.log("in getContent 1", ref_block, ref_block[0]);
+    console.log("in getContent 2", ref_block[0][0].split('\n'));
   }
 
   // FIX use regex to get rid of `prop::`
@@ -35,7 +37,7 @@ async function getContent(ref_id) {
   let ref_block_cleaned = ref_block.split('\n');
 
   if (__debug) {
-    console.log("in getContent", ref_block_cleaned);
+    console.log("in getContent 3", ref_block_cleaned);
     console.log(ref_block_cleaned[0]);
   }
 
@@ -45,8 +47,6 @@ async function getContent(ref_id) {
   return "";
 }
 
-// import { getAreaBlockAssetUrl } from "./utils/assets"
-import { readOcr, updateOcr, wrapTex } from "./utils/areaHL"
 
 function formatStyle(excerpt) {
   const style = logseq.settings.excerpt_style;
@@ -72,7 +72,12 @@ async function extractRef(uuid) {
     prop_uuid = `\n${prop}:: ${ref}\n`
   }
 
-  const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
+  const hl_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
+
+  if (__debug) {
+    console.log("extract uuid", uuid);
+    console.log("in extractRef", hl_type);
+  }
 
   if (hl_type == "annotation") {
     return prop_uuid + formatStyle(ref_content)
@@ -84,13 +89,13 @@ async function extractRef(uuid) {
   if (prop_ocr == "") {
     prop_ocr = await updateOcr(uuid);
   }
-  return wrapTex(prop_ocr, uuid)
+  return wrapAreaIdTex(prop_ocr, uuid)
   // }
 }
 
 const pattern_block_ref = /\(\(([\w-]*?)\)\)/g;
 async function extractBlock(block) {
-  // TODO Fix: edge cases of reconstruct a block containing ref(s)
+  // TODO Fix: edge cases of reconstruction of a block containing ref(s)
   // 1. multiple refs in a block  
   // 2. DONE ref surrounded by text 
 
@@ -142,6 +147,16 @@ async function registerShortcuts() {
   },
     extractEditor
   );
+  logseq.App.registerCommandPalette({
+    key: `Open_current_line_in_default_editor`,
+    label: "Open current line in default editor",
+    keybinding: {
+      binding: "ctrl+shift+e",
+      mode: "global",
+    }
+  },
+    () => importSelectedToCursor()
+  );
 }
 
 
@@ -159,11 +174,10 @@ async function registerMacro() {
       if (type !== ':pdf') return
       if (!path) path = ""
 
-      await logseq.Editor.updateBlock(payload.uuid, "[:i \"Working..📈..📈.\"]")
+      // await logseq.Editor.updateBlock(payload.uuid, "")
       // let logscores: string = await parseScores(count_total_scores)
       // await logseq.Editor.updateBlock(payload.uuid, logscores)
       let zotero = logseq.settings?.zotero;
-      console.log("in zotero", zotero);
 
     } catch (error) { console.log(error) }
   })
@@ -227,6 +241,7 @@ export default {
     // });
 
     // checkCurrentPage();
+
 
     registerShortcuts();
     registerMacro();

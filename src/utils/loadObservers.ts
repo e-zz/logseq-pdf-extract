@@ -1,16 +1,16 @@
 
 import { areaObserverInit, areaChangedObserverRun, areaChangedObserverStop } from "./ocrObserver";
-import { addOCRButton } from "./areaHL";
+import { addOCRButtonInPage } from "./addOcrButton";
 export async function injectAreaHL() {
 
-  addOCRButton();
+  addOCRButtonInPage();
   areaObserverInit();
   areaChangedObserverRun();
 
   logseq.App.onRouteChanged(() => {
     areaChangedObserverStop();
     setTimeout(() => {
-      addOCRButton();
+      addOCRButtonInPage();
       areaChangedObserverRun();
     }, 100);
   });

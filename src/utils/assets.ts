@@ -27,7 +27,6 @@ export async function getAreaBlockAssetUrl(uuid, page_id) {
   const { id, hlStamp, hlPage } = props;
 
   let file_assets = await findFile(page_id);
-  console.log("file_name", page_id, file_assets);
 
   if (props && page_id && id) {
 
@@ -35,7 +34,6 @@ export async function getAreaBlockAssetUrl(uuid, page_id) {
     // const encodedChars = /%[0-9a-f]{2}/i.test(groupKey);
     // groupKey = encodedChars ? encodeURI(groupKey) : groupKey;
     let res = `${file_assets}/${hlPage}_${id}_${hlStamp}.png`;
-    console.log("res", res);
 
     return res
   }

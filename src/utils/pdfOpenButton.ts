@@ -1,3 +1,4 @@
+let __debug = false;
 
 function normalizePath(path) {
   // Replace multiple slashes with a single slash
@@ -24,8 +25,6 @@ const reg_PDFname = /((?:[^<>:"|?*\\\/]+)\.pdf)/;
 // TODO zotero root dir: either read from logseq zotero settings or from plugin settings 
 
 async function getPDFRoot() {
-  // let zotero = await logseq.App.getUserConfigs();
-  // console.log("in getZoteroConfig", zotero);
   let dirs = await logseq.settings["PDF Root"];
   // get dir separated by comma or line break or both
   dirs = dirs.split(/\s*[,\n]{1,}\s*/);
@@ -43,7 +42,6 @@ export async function buttonFromClipboard() {
 
   let zotero_root = await getPDFRoot();
   // zotero_root = zotero_root.map(p => normalizePath(p));
-  console.log("in zotero root", zotero_root);
 
   let filePath = "";
   try {
@@ -52,12 +50,10 @@ export async function buttonFromClipboard() {
     if (filePath == "") {
       throw new Error("Empty clipboard");
     }
-    console.log("in buttonFromClipboard 1", (filePath));
     const match = filePath.match(regex[0]);
     // TODO add more regex for matching pdf file path from clipboard
-    console.log("in buttonFromClipboard 2", match);
     if (match) {
-      filePath = normalizePath(match[1]); // The full match is the file path
+      filePath = normalizePath(match[1]);
     } else {
       filePath = ""; // If the regex doesn't match, clear filePath
     }
@@ -65,12 +61,12 @@ export async function buttonFromClipboard() {
     console.log("in error", error);
     // If reading as text fails, handle other types
     const items = await navigator.clipboard.read();
-    console.log("in items", items);
+    if (__debug) console.log("in items", items);
     for (const item of items) {
       // if (item.types.includes('application/pdf')) {
       // The clipboard contains a PDF file, so get the path
       const blob = await item.getType('application/pdf');
-      console.log("in pdfblob", blob);
+      if (__debug) console.log("in pdfblob", blob);
       filePath = URL.createObjectURL(blob);
       break;
       // TODO support copied PDF file
@@ -81,18 +77,18 @@ export async function buttonFromClipboard() {
 
   // Add more else if blocks for other file types as needed
   if (filePath == "") {
-    console.log("in buttonFromClipboard", "No valid file path");
+    if (__debug) console.log("in buttonFromClipboard", "No valid file path");
     return;
   }
-  console.log("after parse clipboard", filePath);
-  console.log("zotero root", zotero_root);
+  if (__debug) console.log("after parse clipboard", filePath);
+  if (__debug) console.log("zotero root", zotero_root);
   let macro = filePath.replace(zotero_root[0], "");
   macro = macro.replace(zotero_root[1], "");
   // TODO less dirty way to prune zotero root dir from path
   // TODO allow user to customize if they want to keep file name
   const basename = macro.match(reg_PDFname)[1];
   macro = `${basename} {{zotero-linked-file "${macro}"}}`
-  console.log('File path: ', macro)
+  if (__debug) console.log('File path: ', macro)
   logseq.Editor.insertAtEditingCursor(macro);
   // get the file path
   // const path = file?.path;

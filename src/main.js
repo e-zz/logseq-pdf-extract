@@ -25,7 +25,6 @@ function main() {
   })
 
   const key = logseq.baseInfo.id
-  console.log(key);
 
   logseq.provideStyle(`
   div[data-injected-ui=pdf-extract-${key}] {
@@ -64,95 +63,68 @@ function main() {
 
   // main UI
   createApp(App).mount('#app')
-  
+
 
   changePropsLoad();
-  
+
   injectAreaHL();
 }
 
 // bootstrap
 logseq
   .useSettingsSchema([
-  // {
-  //   key: 'distro',
-  //   type: 'enum',
-  //   title: 'URL Scheme',
-  //   description: 'Open the files in either VS Code Stable, Insiders or VS Codium',
-  //   default: 'stable',
-  //   enumChoices: ['stable', 'insiders', 'vs codium'],
-  //   enumPicker: 'select'
-  // }, {
-  //   key: 'window',
-  //   type: 'enum',
-  //   title: 'VS Code Window',
-  //   description: 'Where do you want to open the page?',
-  //   default: 'stable',
-  //   enumChoices: ['Always in a new window', 'Reuse the last active window', 'In the graph folder', 'In the graph folder (as workspace)'],
-  //   enumPicker: 'select'
-  // },
-  // {
-  //   key: 'key_convert',
-  //   type: 'string',
-  //   title: 'Shortcut: open current line',
-  //   description: 'Shortcut to Extract the current line (default `ctrl+alt+o`)',
-  //   default: 'mod+alt+o',
-  // },
-  // {
-  //   key: 'key_open_page',
-  //   type: 'string',
-  //   title: 'Shortcut: open current page',
-  //   description: 'Shortcut to Extract the current page (default `ctrl+o`)',
-  //   default: 'mod+o',
-  // },
-  //  {
-  //   key: 'key_open_graph',
-  //   type: 'string',
-  //   title: 'Shortcut: open current graph',
-  //   description: 'Shortcut to Extract the current graph (default `ctrl+shift+o`)',
-  //   default: 'mod+shift+o',
-  // },
-  { key: 'key_convert',
-    type: 'string',
-    title: 'Shortcut: extract annotations in the focused block(s)',
-    description: 'Shortcut to extract text (or OCR) from PDF ref (default `ctrl+alt+i`)',
-    default: 'mod+alt+i',
-  },
-  { key: 'prop_name',
-    type: 'string',
-    title: 'Name of the property to store PDF refs',
-    description: 'Name of the property to store PDF refs (default `pdf-ref`). If empty, link to PDF annotation will be removed.',
-    default: 'pdf-ref',
-  },
-  { key: 'excerpt_style',
-    type: 'string',
-    inputAs: "textarea",
-    default: "> {{excerpt}}\n\n",
-    title: 'Customize the style for your PDF excerpts',
-    description: 'Use `{{excerpt}}` as placeholder of your excerpt.',
-  },
-  {
-    key: "PDF Root",
-    type: "string",
-    inputAs: "textarea",
-    default: "",
-    title: "PDF Root Folders for `open` Button",
-    description:
-        "Fill in the root folders of your PDF files, separated by comma. For example: /home/user/Documents, C:/Users/Downloads",
-  },
-  {
-    key: "HuggingFace User Access Token",
-    type: "string",
-    default: "",
-    title: "HuggingFace User Access Token",
-    description:
+    {
+      key: 'key_convert',
+      type: 'string',
+      title: 'Shortcut: extract annotations in the focused block(s)',
+      description: 'Extract text (or OCR TeX) from PDF annotations (default `ctrl+alt+i`)',
+      default: 'mod+alt+i',
+    },
+    {
+      key: 'key_import',
+      type: 'string',
+      title: 'Shortcut: import items selected in Zotero',
+      description: 'Import seleceted Zotero items (default `ctrl+alt+e`)',
+      default: 'mod+alt+e',
+    },
+    {
+      key: 'prop_name',
+      type: 'string',
+      title: 'Name of the property to store PDF refs',
+      description: 'Name of the property to store PDF refs (default `pdf-ref`). If empty, link to PDF annotation will be removed.',
+      default: 'pdf-ref',
+    },
+    {
+      key: 'excerpt_style',
+      type: 'string',
+      inputAs: "textarea",
+      default: "> {{excerpt}}\n\n",
+      title: 'Customize the style for your PDF excerpts',
+      description: 'Use `{{excerpt}}` as placeholder of your excerpt.',
+    },
+    {
+      key: 'area_style',
+      type: 'string',
+      inputAs: "textarea",
+      default: "((uuid))\n$$tex$$",
+      title: 'Customize style for area OCR results',
+      description: 'Use `tex` as placeholder for OCR results. For example, `$tex$` for inline math. And remove the `((uuid))` placeholder to replace picture with OCR results.',
+    },
+    {
+      key: "HuggingFace User Access Token",
+      type: "string",
+      default: "",
+      title: "HuggingFace User Access Token",
+      description:
         " Paste your HuggingFace User Access Token. For more information https://huggingface.co/docs/hub/security-tokens",
-  },
-  { key: 'area_style',
-    type: 'string',
-    inputAs: "textarea",
-    default: "((uuid))\n$$tex$$",
-    title: 'Customize style for area OCR results',
-    description: 'Use `tex` as placeholder for OCR results. For example, `$tex$` for inline math. And remove the `((uuid))` placeholder to replace picture with OCR results.',
-  },
+    },
+    {
+      key: "PDF Root",
+      type: "string",
+      inputAs: "textarea",
+      default: "",
+      title: "PDF Root Folders for `open` Button",
+      description:
+        "Fill in the root folders of your PDF files, separated by comma. For example: /home/user/Documents, C:/Users/Downloads",
+    },
   ]).ready(createModel()).then(main)

@@ -12,7 +12,6 @@ export const refProps = async (propsKeysList?: HTMLElement[]) => {
     // if (globals.pluginConfig.hideSetOfProps) {
     //   refPropsArr = (globals.pluginConfig.hideSetOfProps as string).trim().toLowerCase().replaceAll(' ', '').split(',');
     // }
-    console.log("invoked refProps");
 
     let refPropsArr = logseq.settings.prop_name;
     for (let i = 0; i < propsKeysList.length; i++) {
