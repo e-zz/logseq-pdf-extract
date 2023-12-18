@@ -1,8 +1,12 @@
 {
     "compilerOptions": {
         "target": "es6",
+        "lib": [
+            "es2016",
+            "dom"
+        ],
         "checkJs": true,
-        "moduleResolution":"node",
+        "moduleResolution": "node",
     },
     "typeAcquisition": {
         "include": [

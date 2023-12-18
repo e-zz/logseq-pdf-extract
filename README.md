@@ -1,6 +1,90 @@
-## PDF Extract
+# PDF Extract
+## A Quick Guide
+### Annotation Extraction
+Use `Ctrl+Alt+i` to get the original text of the reference to annotation block. A template is provided to customize the style of the inserted text. See [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) for more details.
 
-## Development
+<!-- TODO explain the pdf-ref property -->
+
+### TeX OCR of Area Highlights
+Inspired by [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-formula-ocr-plugin), this plugin helps to extract TeX from area highlights.
+
+> ❗ **For new users: API token** The OCR service from Hugging Face is used.
+> 1. Get a [Hugging Face API token](https://huggingface.co/settings/tokens)
+> 2. In the plugin settings, paste your API key to the `HuggingFace User Access Token` field.
+> 
+> Notice that the free quota of the OCR service is not quite clear to me (please tell me if you know the number). For more info, see [Hugging Face - Documentation - huggingface.co/](https://huggingface.co/docs).
+
+Notice the plugin modifies `hl__xxx` pages. A block property `ocr::`  will be added to the area highlight block, as shown below. This is to avoid repeated OCR of the same area highlight. If you want to re-OCR an area highlight, just delete the `ocr::` property.
+
+<img src="originalAreaHL.png" width="200" >
+
+
+Two ways are provided to extract TeX from area highlights: button and shortcut.
+#### Button: Copy TeX to clipboard
+On the area highlights, a button named `copy as TeX` is provided to copy TeX to clipboard.  
+<img src="areaHL.png" width="200" >
+
+
+#### Shortcut: Insert TeX into the Block
+Use `Ctrl+Alt+i` to insert TeX string into the block. A template is provided to customize the style of the inserted TeX. See [Template for TeX OCR](#area_style-template-for-inserting-tex) for more details.
+
+
+### Extract Zotero Items  (Experimental)
+ This function mimics Logseq's `/Zotero` command, but it's fully local.
+
+> ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working.
+
+#### Import items already selected in Zotero 
+Use `Ctrl+Alt+e` to import items selected in Zotero. The items will be imported as Logseq pages.
+
+#### Show Recent Items in Zotero
+To be implemented
+
+#### Search Box 
+To be implemented
+
+### PDF Open Button 
+Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` to open a PDF in Zotero. If you set your `Zotero linked attachment base directory` in the Logseq Zotero settings, then the PDF will be opened even if it's not in the assets folder.
+
+Here is how we could use it till now:
+- (One-time setting) If you're using this plugin for the first time, you'll need to set the `PDF Root` in the plugin settings. This should be the path to your `Zotero linked attachment base directory`. To do this, navigate to the plugin settings, find the `PDF Root` field, and paste your path into this field.
+- Copy the path to any PDF in the path `Zotero linked attachment base directory`
+- In Logseq, use the slash command `/PDF: insert button from copied PDF`
+
+> **Be caureful!** Buttons are fragile. If Logseq can't find a PDF specified in the button, it might collapse (possible data loss). Then one has to re-generate the button to locate the PDF. It's possible to dynamically update the button in future.
+
+> **How it works and when to use it.**
+Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. But to better support this feature, we need to wait for [this PR](https://github.com/logseq/logseq/pull/10430) to be merged. Before that, this function is no more than a shortcut to copy a button from the item page `@pdf title`.
+
+Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking of reading progress.
+
+## Settings
+#### `excerpt_style`: Template for Annotation Excerpts
+This template defines the style of the inserted text. In the template, `{{excerpt}}` is provided as a placeholder, which will be replaced by the excerpt. The default template is
+``` 
+> {{excerpt}}
+```
+
+#### `area_style`: Template for Inserting TeX 
+When inserting TeX, one could customize the style by a template. In the template, two placeholders are provided: `uuid` and `tex`, which will be replaced by the UUID of the area highlight and the TeX respectively. The default template is
+```
+((uuid))\n$$tex$$
+```
+> For example, if you need to replace the original area highlights with TeX, then use `$$tex$$` as the template. More complex template with hiccup syntax should be possible, but I haven't tested it.
+
+# Acknowledgements
+TeX OCR
+- olmobaldoni: [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-formula-ocr-plugin)
+- NormXU: [nougat-latex-ocr](https://github.com/NormXU/nougat-latex-ocr)
+- Hugging Face: [Norm/nougat-latex-base](https://huggingface.co/Norm/nougat-latex-base)
+
+Zotero API 
+- Zotero: [Zotero API](https://www.zotero.org/support/dev/web_api/v3/start)
+- MunGell: [ZotServer](https://github.com/MunGell/ZotServer)
+- cboulanger: [excite-docker](https://github.com/cboulanger/excite-docker)
+
+
+# Development
 
 - Install dependencies with `npm install`
 - Build the application using `npm run build` or `npm run watch`
