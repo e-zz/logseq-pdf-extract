@@ -2,7 +2,7 @@ import { Zapi } from "./zapi"
 // import { ZoteroItem } from "./zoteroItem";
 // More customized searches and post-process based on the Zotero API
 
-let __debug = true;
+let __debug = false;
 
 function itemAttachmentConverter(itemAttachment: any) {
   // preliminary processing of attachment paths
@@ -186,7 +186,6 @@ export class zimport {
             // REFA better way to proecess attachment path. Make it a function or class
             let baseName = attachment.split(/[\/:]/).pop();
 
-            console.log("in preImport \t storage", key, value[key], attachment[0], baseName);
             if (attachment.startsWith('storage:')) {
 
               attachments.push(`[${baseName}](${this.localLink(key)})` + " " + zoteroStorageToButton(key, attachment));
@@ -233,7 +232,7 @@ export class zimport {
 
   async safeImport() {
     // check if the item is already imported. If not, import it.
-    console.log("in safeImport", this.item);
+    if (__debug) console.log("in safeImport", this.item);
 
     const title = "@" + this.item.title;
     const itemPage = await logseq.Editor.getPage(title);
@@ -261,7 +260,8 @@ export class zimport {
 
 export async function importSelectedToCursor() {
   const z = new Zotero();
-  let selected = await z.getSelected();
+  const selected = await z.getSelected();
+  const insertButton = logseq.settings.insert_button;
   if (__debug) console.log("in importSelectedToCursor \t selected", selected);
 
   let createdPages = await Promise.all(selected.map(item => new zimport(item).safeImport()));
@@ -271,13 +271,13 @@ export async function importSelectedToCursor() {
     for (let i = 0; i < selected.length; i++) {
       const title = "@" + selected[i].title;
 
-      let insertContent = wrapTag(title) + " ";
-      if (selected[i].attachments) {
+      let insertContent = wrapTag(title);
+      if (insertButton && selected[i].attachments) {
         // REFA zotserver: make attachments as a list of {key: {path: path, type: type}}
+        insertContent += " ";
 
         let [firstKey, firstFile] = Object.entries(selected[i].attachments)[0];
         // TODO allow to choose attachment to be inserted 
-
 
         if (firstFile.startsWith('storage:')) {
           // TODO Maybe in ZotServer/selected endpoint, we should keep the type of attachment, like "linked-file" or "imported-file"
@@ -285,9 +285,9 @@ export async function importSelectedToCursor() {
         } else {
           insertContent += zoteroAttachmentToButton(firstFile);
         }
-
-        logseq.Editor.insertAtEditingCursor(insertContent);
       }
+      logseq.Editor.insertAtEditingCursor(insertContent);
+
     }
   }
   else {
