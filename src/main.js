@@ -77,14 +77,14 @@ logseq
       key: 'key_convert',
       type: 'string',
       title: 'Shortcut: extract annotations in the focused block(s)',
-      description: 'Extract text (or OCR TeX) from PDF annotations (default `ctrl+alt+i`)',
+      description: 'Extract text (or OCR TeX) from PDF annotations (default `ctrl+alt+i`). Restart or refresh Logseq to take effect.',
       default: 'mod+alt+i',
     },
     {
       key: 'key_import',
       type: 'string',
       title: 'Shortcut: import items selected in Zotero',
-      description: 'Import seleceted Zotero items (default `ctrl+alt+e`)',
+      description: 'Import seleceted Zotero items (default `ctrl+alt+e`). Restart or refresh Logseq to take effect.',
       default: 'mod+alt+e',
     },
     {

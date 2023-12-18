@@ -248,21 +248,25 @@ export async function importSelectedToCursor() {
 
   let createdPages = await Promise.all(selected.map(item => new zimport(item).safeImport()));
 
-  // REFA make item a class, which has a method to insert itself
-  for (let i = 0; i < selected.length; i++) {
-    if (logseq.Editor.checkEditing()) {
+  if (logseq.Editor.checkEditing()) {
+    // REFA make item a class, which has a method to insert itself
+    for (let i = 0; i < selected.length; i++) {
+      const title = "@" + selected[i].title;
 
-      let insertContent = wrapTag("@" + selected[i].title) + " "
+      let insertContent = wrapTag(title) + " ";
       if (selected[i].attachments) {
-        // FIX insert the first attachment as a button
-        insertContent += zoteroAttaPathToButton(Object.values(selected[i].attachments)[0])
+        // FIX insert other attachments as a button ?
+        insertContent += zoteroAttaPathToButton(Object.values(selected[i].attachments)[0]);
       }
 
       logseq.Editor.insertAtEditingCursor(insertContent);
     }
   }
+  else {
+    logseq.UI.showMsg(`${createdPages.length} page(s) created.`);
+    console.log("PDF Extract: created new pages", createdPages);
+  }
 }
-
 
 export async function test_zimport() {
   let selected = await getSelected();

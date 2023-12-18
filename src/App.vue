@@ -138,8 +138,8 @@ async function extractEditor() {
 
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
-    key: `Open_current_line_in_default_editor`,
-    label: "Open current line in default editor",
+    key: `extract_annotations_in_selected_blocks`,
+    label: "Extract annotations in selected blocks",
     keybinding: {
       binding: logseq.settings.key_convert,
       mode: "global",
@@ -147,16 +147,23 @@ async function registerShortcuts() {
   },
     extractEditor
   );
-  logseq.App.registerCommandPalette({
-    key: `Open_current_line_in_default_editor`,
-    label: "Open current line in default editor",
+  logseq.App.registerCommandShortcut(
+    {
+      binding: logseq.settings.key_import,
+      mode: "editing",
+    },
+    () => importSelectedToCursor()
+  );
+  logseq.App.registerCommand("PDF Extract", {
+    key: `import_selected`,
+    label: "PDF: import selected Zotero items to cursor",
     keybinding: {
-      binding: "ctrl+shift+e",
+      binding: logseq.settings.key_import,
       mode: "global",
     }
   },
     () => importSelectedToCursor()
-  );
+  )
 }
 
 
@@ -164,6 +171,10 @@ async function registerSlashCommand() {
   logseq.Editor.registerSlashCommand(
     "PDF: insert button from copied PDF",
     buttonFromClipboard
+  );
+  logseq.Editor.registerSlashCommand(
+    "PDF: import selected Zotero items to cursor",
+    () => importSelectedToCursor()
   );
 }
 
