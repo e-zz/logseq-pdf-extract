@@ -1,7 +1,7 @@
 // import { ZoteroItem } from "./zoteroItem";
 
 export class Zapi {
-    // Adopted from https://github.com/cboulanger/excite-docker/web/web/scripts.js
+    // Adapted from https://github.com/cboulanger/excite-docker/web/web/scripts.js
 
     static controller;
     static BASE_URL = `http://localhost:23119/`;
