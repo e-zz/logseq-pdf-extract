@@ -32,10 +32,17 @@ Use `Ctrl+Alt+i` to insert TeX string into the block. A template is provided to 
 ### Extract Zotero Items  (Experimental)
  This function mimics Logseq's `/Zotero` command, but it's fully local.
 
-> ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working.
+> ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working. Also, keep Zotero open while importing.
 
 #### Import items already selected in Zotero 
 Use `Ctrl+Alt+e` to import items selected in Zotero. The items will be imported as Logseq pages.
+
+![demonstration](importSelected.gif)
+
+- [ ] Attachments in Zotero storage 
+- [x] Linked files
+- [ ] Option: turn off the automatic insertion of PDF open buttons while importing
+- [x] Slash command: `/PDF Extract: import items selected in Zotero`
 
 #### Show Recent Items in Zotero
 To be implemented
@@ -43,20 +50,24 @@ To be implemented
 #### Search Box 
 To be implemented
 
-### PDF Open Button 
-Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` to open a PDF in Zotero. If you set your `Zotero linked attachment base directory` in the Logseq Zotero settings, then the PDF will be opened even if it's not in the assets folder.
+#### Notes
+Not in plan yet. But PRs are welcome.
 
-Here is how we could use it till now:
+### PDF Open Button (Experimental)
+With [Zotero integration](https://docs.logseq.com/#/page/zotero) enalbed, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
+<img src="pdfOpenButton.png" width="250" >
+
+Here is how we could take advantage of it:
 - (One-time setting) If you're using this plugin for the first time, you'll need to set the `PDF Root` in the plugin settings. This should be the path to your `Zotero linked attachment base directory`. To do this, navigate to the plugin settings, find the `PDF Root` field, and paste your path into this field.
-- Copy the path to any PDF in the path `Zotero linked attachment base directory`
+- Copy the path to any PDF under the path `Zotero linked attachment base directory`
 - In Logseq, use the slash command `/PDF: insert button from copied PDF`
 
-> **Be caureful!** Buttons are fragile. If Logseq can't find a PDF specified in the button, it might collapse (possible data loss). Then one has to re-generate the button to locate the PDF. It's possible to dynamically update the button in future.
+> **Caution!** Buttons are delicate. If Logseq cannot find a PDF specified by the button, it may crash (possible data loss). Dynamical update might be implemented in the future. But no easy solutions so far. One idea is to record Zotero item key to update the button from Zotero. PRs or ideas are welcome.
 
 > **How it works and when to use it.**
-Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. But to better support this feature, we need to wait for [this PR](https://github.com/logseq/logseq/pull/10430) to be merged. Before that, this function is no more than a shortcut to copy a button from the item page `@pdf title`.
-
-Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking the reading progress.
+Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. But this feature relies on [this PR](https://github.com/logseq/logseq/pull/10430). Till now, this function can only be used as an alternative to copy a button that already exists in Zotero item page `@xxx` by hands.
+>
+> And maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking the reading progress.
 
 ## Settings
 #### `excerpt_style`: Template for Annotation Excerpts
@@ -92,10 +103,10 @@ Coding Assistance
 
 # Support
 Find this plugin useful? [Buy me a coffee](https://www.buymeacoffee.com/e.zz) ☕️ or you could support my favorite Logseq plugins and their developers. It's also a great help for me. 
-- [debanjandhar12/logseq-anki-sync](https://github.com/debanjandhar12/logseq-anki-sync): I love its idea of inserting backlinks to Logseq blocks. It has significantly enhanced my experience of reviewing and updating cards on Anki mobile.
--  [haydenull/logseq-plugin-agenda](https://github.com/haydenull/logseq-plugin-agenda): a game changer for my task management.
+- [debanjandhar12/logseq-anki-sync](https://github.com/debanjandhar12/logseq-anki-sync): I love its idea of keeping links to Logseq blocks in Anki cards. It has significantly enhanced my experience of reviewing and updating cards on Anki mobile.
+-  [haydenull/logseq-plugin-agenda](https://github.com/haydenull/logseq-plugin-agenda): a game changer for task management.
 
-Both are still under active development.
+Both projects are not only feature-rich but also continue to evolve through active development.
 
 # Development
 
