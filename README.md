@@ -39,9 +39,9 @@ Use `Ctrl+Alt+e` to import items selected in Zotero. The items will be imported 
 
 ![demonstration](importSelected.gif)
 
-- [ ] Attachments in Zotero storage 
+- [x] Attachments in Zotero storage 
 - [x] Linked files
-- [ ] Option: turn off the automatic insertion of PDF open buttons while importing
+- [x] Option: turn off the automatic insertion of PDF open buttons while importing
 - [x] Slash command: `/PDF Extract: import items selected in Zotero`
 
 #### Show Recent Items in Zotero
@@ -51,11 +51,14 @@ To be implemented
 To be implemented
 
 #### Notes
-Not in plan yet. But PRs are welcome.
+Not currently planned. But PRs are welcome.
 
 ### PDF Open Button (Experimental)
 With [Zotero integration](https://docs.logseq.com/#/page/zotero) enalbed, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
+
+<br>
 <img src="pdfOpenButton.png" width="250" >
+<br>
 
 Here is how we could take advantage of it:
 - (One-time setting) If you're using this plugin for the first time, you'll need to set the `PDF Root` in the plugin settings. This should be the path to your `Zotero linked attachment base directory`. To do this, navigate to the plugin settings, find the `PDF Root` field, and paste your path into this field.
