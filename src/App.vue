@@ -147,13 +147,13 @@ async function registerShortcuts() {
   },
     extractEditor
   );
-  logseq.App.registerCommandShortcut(
-    {
-      binding: logseq.settings.key_import,
-      mode: "editing",
-    },
-    () => importSelectedToCursor()
-  );
+  // logseq.App.registerCommandShortcut(
+  //   {
+  //     binding: logseq.settings.key_import,
+  //     mode: "editing",
+  //   },
+  //   () => importSelectedToCursor()
+  // );
   logseq.App.registerCommand("PDF Extract", {
     key: `import_selected`,
     label: "PDF: import selected Zotero items to cursor",
