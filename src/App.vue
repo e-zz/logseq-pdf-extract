@@ -139,7 +139,7 @@ async function extractEditor() {
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
     key: `extract_annotations_in_selected_blocks`,
-    label: "Extract annotations in selected blocks",
+    label: "PDF: Extract selected annotations into their blocks",
     keybinding: {
       binding: logseq.settings.key_convert,
       mode: "global",
