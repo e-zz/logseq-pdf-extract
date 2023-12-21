@@ -139,7 +139,7 @@ async function extractEditor() {
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
     key: `extract_annotations_in_selected_blocks`,
-    label: "Extract annotations in selected blocks",
+    label: "PDF: Extract selected annotations into their blocks",
     keybinding: {
       binding: logseq.settings.key_convert,
       mode: "global",
@@ -147,13 +147,13 @@ async function registerShortcuts() {
   },
     extractEditor
   );
-  logseq.App.registerCommandShortcut(
-    {
-      binding: logseq.settings.key_import,
-      mode: "editing",
-    },
-    () => importSelectedToCursor()
-  );
+  // logseq.App.registerCommandShortcut(
+  //   {
+  //     binding: logseq.settings.key_import,
+  //     mode: "editing",
+  //   },
+  //   () => importSelectedToCursor()
+  // );
   logseq.App.registerCommand("PDF Extract", {
     key: `import_selected`,
     label: "PDF: import selected Zotero items to cursor",

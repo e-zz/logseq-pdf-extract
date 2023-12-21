@@ -1,4 +1,4 @@
-let __debug = false;
+let __debug = true;
 
 function normalizePath(path) {
   // Replace multiple slashes with a single slash
@@ -14,7 +14,7 @@ function normalizePath(path) {
 }
 
 const regex = [
-  /file:\/+((?:[a-zA-Z]:)?(?:[^<>:"|?*]+)*\.pdf)/,
+  /(?<=file:)\/+((?:[a-zA-Z]:)?(?:[^<>:"|?*]+)*\.pdf)/,
   /([a-zA-Z]:)?((?:[^<>:"|?*]+)\.pdf)/,
 ];
 
@@ -35,7 +35,23 @@ async function getPDFRoot() {
   return dirs
 }
 
+async function pathParser(path : string) {
+  path = normalizePath(path);
 
+  let basename = path.match(reg_PDFname)[1]; 
+
+  path = path.replace("file://", "");
+
+  let zotero_root = await getPDFRoot();
+  
+  let relPath = ""
+  for (let i = 0; i < zotero_root.length; i++) {
+    if (path.startsWith(zotero_root[i])) {
+      relPath = path.replace(zotero_root[i], "");
+    }
+  } 
+  return [relPath, basename]
+}
 
 export async function buttonFromClipboard() {
   window.focus();
@@ -47,16 +63,12 @@ export async function buttonFromClipboard() {
   try {
     // Try to read the clipboard as text
     filePath = await navigator.clipboard.readText();
-    if (filePath == "") {
-      throw new Error("Empty clipboard");
-    }
-    const match = filePath.match(regex[0]);
-    // TODO add more regex for matching pdf file path from clipboard
-    if (match) {
-      filePath = normalizePath(match[1]);
-    } else {
-      filePath = ""; // If the regex doesn't match, clear filePath
-    }
+      const [ relPath, basename ] = await pathParser(filePath);
+      // TODO allow user to customize if they want to keep file name
+      let macro = `${basename} {{zotero-linked-file "${relPath}"}}`
+      if (__debug) console.log('File path: ', macro)
+      logseq.Editor.insertAtEditingCursor(macro);
+      return
   } catch (error) {
     console.log("in error", error);
     // If reading as text fails, handle other types
@@ -82,15 +94,4 @@ export async function buttonFromClipboard() {
   }
   if (__debug) console.log("after parse clipboard", filePath);
   if (__debug) console.log("zotero root", zotero_root);
-  let macro = filePath.replace(zotero_root[0], "");
-  macro = macro.replace(zotero_root[1], "");
-  // TODO less dirty way to prune zotero root dir from path
-  // TODO allow user to customize if they want to keep file name
-  const basename = macro.match(reg_PDFname)[1];
-  macro = `${basename} {{zotero-linked-file "${macro}"}}`
-  if (__debug) console.log('File path: ', macro)
-  logseq.Editor.insertAtEditingCursor(macro);
-  // get the file path
-  // const path = file?.path;
-  // console.log("in buttonFromPath", path);
 }
