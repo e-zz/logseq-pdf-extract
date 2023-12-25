@@ -38,11 +38,15 @@ async function getTexFromHuggingFace(blob) {
 
     // Convert the estimated_time from seconds to milliseconds
     const waitTime = result.estimated_time * 1000;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(getTexFromHuggingFace(blob));
-      }, waitTime);
-    });
+    if (waitTime) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(getTexFromHuggingFace(blob));
+        }, waitTime);
+      });
+    } else {
+      logseq.UI.showMsg(`Wait time ${waitTime}`);
+    }
   }
 
   // If there is no error, return the result
