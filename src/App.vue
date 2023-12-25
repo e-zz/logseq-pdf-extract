@@ -14,12 +14,12 @@
 </template>
 
 <script>
-const __debug = true;
+const __debug = false;
 
 
 import { buttonFromClipboard } from "./utils/pdfOpenButton"
 import { readOcr, updateOcr } from "./utils/ocrLib"
-import { importSelectedToCursor, test_zimport } from './utils/zotero'
+import { importSelectedToCursor } from './zotero/zotero'
 import { wrapAreaIdTex } from "./utils/texLib";
 
 async function getContent(ref_id) {
@@ -72,11 +72,11 @@ async function extractRef(uuid) {
     prop_uuid = `\n${prop}:: ${ref}\n`
   }
 
-  const hl_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
+  const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
 
   if (__debug) {
     console.log("extract uuid", uuid);
-    console.log("in extractRef", hl_type);
+    console.log("\t hl_type ", hl_type);
   }
 
   if (hl_type == "annotation") {

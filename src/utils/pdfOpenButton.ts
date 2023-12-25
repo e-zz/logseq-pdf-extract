@@ -1,4 +1,4 @@
-let __debug = true;
+let __debug = false;
 
 function normalizePath(path) {
   // Replace multiple slashes with a single slash
