@@ -1,5 +1,3 @@
-// import { ZoteroItem } from "./zoteroItem";
-
 export class Zapi {
     // Adapted from https://github.com/cboulanger/excite-docker/web/web/scripts.js
 
@@ -115,7 +113,7 @@ export class Zapi {
         )
     }
 
-    static async getSelectedItems() {
+    static async getBySelection() {
         return await this.callEndpoint(
             this.API.SELECTED_ITEM_ATTACHMENT_GET,
         )
