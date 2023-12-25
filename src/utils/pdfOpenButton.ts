@@ -35,21 +35,21 @@ async function getPDFRoot() {
   return dirs
 }
 
-async function pathParser(path : string) {
+async function pathParser(path: string) {
   path = normalizePath(path);
 
-  let basename = path.match(reg_PDFname)[1]; 
+  let basename = path.match(reg_PDFname)[1];
 
   path = path.replace("file://", "");
 
   let zotero_root = await getPDFRoot();
-  
+
   let relPath = ""
   for (let i = 0; i < zotero_root.length; i++) {
     if (path.startsWith(zotero_root[i])) {
       relPath = path.replace(zotero_root[i], "");
     }
-  } 
+  }
   return [relPath, basename]
 }
 
@@ -63,12 +63,12 @@ export async function buttonFromClipboard() {
   try {
     // Try to read the clipboard as text
     filePath = await navigator.clipboard.readText();
-      const [ relPath, basename ] = await pathParser(filePath);
-      // TODO allow user to customize if they want to keep file name
-      let macro = `${basename} {{zotero-linked-file "${relPath}"}}`
-      if (__debug) console.log('File path: ', macro)
-      logseq.Editor.insertAtEditingCursor(macro);
-      return
+    const [relPath, basename] = await pathParser(filePath);
+    // TODO allow user to customize if they want to keep file name
+    let macro = `${basename} {{zotero-linked-file "${relPath}"}}`
+    if (__debug) console.log('File path: ', macro)
+    logseq.Editor.insertAtEditingCursor(macro);
+    return
   } catch (error) {
     console.log("in error", error);
     // If reading as text fails, handle other types
