@@ -1,6 +1,7 @@
 import '@logseq/libs'
 import { createApp } from 'vue'
 import { injectAreaHL, changePropsLoad } from './utils/loadObservers'
+import { registerCommands } from './registerCommands'
 import App from './App.vue'
 import './index.css'
 
@@ -68,6 +69,8 @@ function main() {
   changePropsLoad();
 
   injectAreaHL();
+
+  registerCommands();
 }
 
 // bootstrap
