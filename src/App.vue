@@ -1,8 +1,7 @@
 <template>
   <div class="container-wrap" v-bind:class="{ lspdark: opts.isDark }" @click="_onClickOutside">
     <div class="container-inner shadow-lg" v-if="ready" :style="{ left: left + 'px', top: top + 'px' }">
-
-
+      <Item />
     </div>
   </div>
 </template>
@@ -12,6 +11,7 @@ const __debug = false;
 
 
 
+import Item from "./components/Item.vue";
 import { ref, onMounted } from 'vue';
 
 const ready = ref(false);
