@@ -35,8 +35,10 @@ async function registerShortcuts() {
     () => importSelectedToCursor()
   )
 }
-async function showSearchBox() {
+
+function showSearchBox() {
   logseq.showMainUI();
+  return null
 }
 
 async function registerSlashCommand() {
