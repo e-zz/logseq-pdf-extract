@@ -34,12 +34,14 @@ export class Page implements ZoteroPage {
   title: string;
   props: { [key: string]: string | string[] | number };
   attachments?: Attachment[];
+  abstract?: string;
 
   constructor() { }
 
   static fromRaw(rawData: any): Page {
     let props = {};
-    let attachments = [];
+    let attachments;
+    let abstract;
     // TODO note 
     // let notes = {}; 
 
@@ -63,6 +65,9 @@ export class Page implements ZoteroPage {
         case 'attachments':
           attachments = value;
           break;
+        case 'abstractNote':
+          abstract = value;
+          break;
         default:
           // remove unwanted keys
           if (unwantedKeys.includes(key)) {
@@ -78,7 +83,12 @@ export class Page implements ZoteroPage {
     let page = new Page();
     page.title = props['title'];
     page.props = props;
-    page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
+    if (attachments) {
+      page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
+    }
+    if (abstract) {
+      page.abstract = abstract;
+    }
     return page
   }
 
@@ -113,7 +123,12 @@ export class Page implements ZoteroPage {
       });
   }
 
-  async importFiles() {
+  async importAbstract() {
+    let block = await logseq.Editor.appendBlockInPage(this.title, "[[Abstract]]")
+    logseq.Editor.insertBlock(block.uuid, this.abstract)
+  }
+
+  async importAttachments() {
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Attachments]]")
 
     this.attachments.forEach(attachment => { logseq.Editor.insertBlock(block.uuid, attachment.pageEntry()) })
@@ -124,7 +139,8 @@ export class Page implements ZoteroPage {
     // returns pageName.
     // let pageContent = Object.entries(this.convertedItem).map(([key, value]) => `${key}:: ${value}`).join('\n');
     await this.create();
-    await this.importFiles();
+    await this.importAbstract();
+    await this.importAttachments();
   }
 
   async safeImport() {
