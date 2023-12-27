@@ -10,7 +10,7 @@ interface ZoteroPage {
 }
 
 function camelToKebab(camelCase: string): string {
-  return camelCase.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+  return camelCase.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 const wrapTag = (tag: string) => `[[${tag}]]`;
@@ -47,9 +47,6 @@ export class Page implements ZoteroPage {
       switch (key) {
         case 'title':
           props['title'] = `@${value}`;
-          break;
-        case 'ISBN':
-          props['isbn'] = value;
           break;
         case 'itemType':
           props['item-type'] = wrapTag(value);
