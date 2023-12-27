@@ -10,7 +10,7 @@ interface ZoteroPage {
 }
 
 function camelToKebab(camelCase: string): string {
-  return camelCase.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+  return camelCase.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 const wrapTag = (tag: string) => `[[${tag}]]`;
@@ -34,22 +34,22 @@ export class Page implements ZoteroPage {
   title: string;
   props: { [key: string]: string | string[] | number };
   attachments?: Attachment[];
+  abstract?: string;
 
   constructor() { }
 
   static fromRaw(rawData: any): Page {
     let props = {};
-    let attachments = [];
+    let attachments;
+    let abstract;
     // TODO note 
     // let notes = {}; 
 
     for (const [key, value] of Object.entries(rawData)) {
       switch (key) {
         case 'title':
+          props['original-title'] = value;
           props['title'] = `@${value}`;
-          break;
-        case 'ISBN':
-          props['isbn'] = value;
           break;
         case 'itemType':
           props['item-type'] = wrapTag(value);
@@ -59,10 +59,14 @@ export class Page implements ZoteroPage {
           props['authors'] = value.map(creator => wrapTag(creator.firstName + creator.lastName)).join(', ');
           break;
         case 'tags':
+          if (value.length == 0) break;
           props['tags'] = value.map(tag => wrapTag(tag)).join(', ');
           break;
         case 'attachments':
           attachments = value;
+          break;
+        case 'abstractNote':
+          abstract = value;
           break;
         default:
           // remove unwanted keys
@@ -79,7 +83,12 @@ export class Page implements ZoteroPage {
     let page = new Page();
     page.title = props['title'];
     page.props = props;
-    page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
+    if (attachments) {
+      page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
+    }
+    if (abstract) {
+      page.abstract = abstract;
+    }
     return page
   }
 
@@ -114,7 +123,12 @@ export class Page implements ZoteroPage {
       });
   }
 
-  async importFiles() {
+  async importAbstract() {
+    let block = await logseq.Editor.appendBlockInPage(this.title, "[[Abstract]]")
+    logseq.Editor.insertBlock(block.uuid, this.abstract)
+  }
+
+  async importAttachments() {
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Attachments]]")
 
     this.attachments.forEach(attachment => { logseq.Editor.insertBlock(block.uuid, attachment.pageEntry()) })
@@ -125,7 +139,8 @@ export class Page implements ZoteroPage {
     // returns pageName.
     // let pageContent = Object.entries(this.convertedItem).map(([key, value]) => `${key}:: ${value}`).join('\n');
     await this.create();
-    await this.importFiles();
+    await this.importAbstract();
+    await this.importAttachments();
   }
 
   async safeImport() {

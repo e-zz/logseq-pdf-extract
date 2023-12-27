@@ -12,7 +12,7 @@
     <DynamicScroller class="search-list-wrap" :items="items" keyField="key" :min-item-size="54">
       <template #default="{ item }">
         <DynamicScrollerItem :item="item">
-          <div :key="item.key" class="zotero-list-item">
+          <div :key="item.key" class="zotero-list-item" @click="insert(item.key)">
             <div class="title">{{ item.title }}</div>
             <div class="info">{{ item.dateModified }}</div>
           </div>
@@ -56,7 +56,12 @@ const search = async () => {
   console.log(res[0]);
 
 }
-
+// TODO multiple select
+const insert = async (key) => {
+  console.log("clicked item key=", key);
+  let res = await Zotero.getByKeys([key,])
+  res = await Zotero.safeImportToCursor(res)
+}
 </script>
 
 <style scoped lang="scss">
