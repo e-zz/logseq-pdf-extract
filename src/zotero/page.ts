@@ -46,6 +46,7 @@ export class Page implements ZoteroPage {
     for (const [key, value] of Object.entries(rawData)) {
       switch (key) {
         case 'title':
+          props['original-title'] = value;
           props['title'] = `@${value}`;
           break;
         case 'itemType':
@@ -56,6 +57,7 @@ export class Page implements ZoteroPage {
           props['authors'] = value.map(creator => wrapTag(creator.firstName + creator.lastName)).join(', ');
           break;
         case 'tags':
+          if (value.length == 0) break;
           props['tags'] = value.map(tag => wrapTag(tag)).join(', ');
           break;
         case 'attachments':
