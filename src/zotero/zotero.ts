@@ -9,6 +9,12 @@ let __debug = false;
 export class Zotero {
   // A wrapper of set of functions based on Zotero API
 
+  static async search(keyword: string) {
+    let res = await Zapi.getByEverything(keyword)
+    if (__debug) console.log(res);
+    return res
+  }
+
   static async getSelected() {
     // get items selected in Zotero (not Note) with their attachments
     let res = ZoteroItems.fromRaw(await Zapi.getBySelection());

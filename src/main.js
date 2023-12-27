@@ -3,17 +3,15 @@ import { createApp } from 'vue'
 import { injectAreaHL, changePropsLoad } from './utils/loadObservers'
 import { registerCommands } from './registerCommands'
 import App from './App.vue'
+import { DynamicScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import './index.css'
 
 /**
  * user model
  */
 function createModel() {
-  return {
-    openPDFExtract() {
-      logseq.showMainUI()
-    },
-  }
+  return {}
 }
 
 /**
@@ -63,7 +61,9 @@ function main() {
   //   })
 
   // main UI
-  createApp(App).mount('#app')
+  const app = createApp(App)
+  app.component('DynamicScroller', DynamicScroller)
+  app.mount('#app')
 
 
   changePropsLoad();
