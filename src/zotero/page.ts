@@ -1,4 +1,4 @@
-const __debug = false;
+const __debug = true;
 
 import { Attachment } from "./attachment";
 
@@ -31,7 +31,7 @@ export class Page implements ZoteroPage {
   // TODO can this cover all the fields in ZoteroRawItem ?
   // key: string;
   // itemType: string;
-  title: string;
+  title: string; // @title
   props: { [key: string]: string | string[] | number };
   attachments?: Attachment[];
   abstract?: string;
@@ -44,6 +44,7 @@ export class Page implements ZoteroPage {
     let abstract;
     // TODO note 
     // let notes = {}; 
+    if (__debug) console.log("in fromRaw", rawData);
 
     for (const [key, value] of Object.entries(rawData)) {
       switch (key) {
@@ -101,18 +102,21 @@ export class Page implements ZoteroPage {
   }
 
   insertRef() {
+    // [[@title]]
     logseq.Editor.insertAtEditingCursor(wrapTag(this.title));
   }
 
   insertTitle() {
+    // @title
     logseq.Editor.insertAtEditingCursor(this.title);
   }
 
   async imported() {
-
+    // FIXME maybe empty page should be considered as not imported
     let lsqPage = await logseq.Editor.getPage(this.title)
     return lsqPage != null;
   }
+
   async create() {
     await logseq.Editor.createPage(
       this.title,
@@ -124,11 +128,13 @@ export class Page implements ZoteroPage {
   }
 
   async importAbstract() {
+    if (!this.abstract) return;
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Abstract]]")
     logseq.Editor.insertBlock(block.uuid, this.abstract)
   }
 
   async importAttachments() {
+    if (!this.hasAttachment()) return;
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Attachments]]")
 
     this.attachments.forEach(attachment => { logseq.Editor.insertBlock(block.uuid, attachment.pageEntry()) })
@@ -136,8 +142,6 @@ export class Page implements ZoteroPage {
 
   async executeImport() {
     // creates @xxx page, 
-    // returns pageName.
-    // let pageContent = Object.entries(this.convertedItem).map(([key, value]) => `${key}:: ${value}`).join('\n');
     await this.create();
     await this.importAbstract();
     await this.importAttachments();
