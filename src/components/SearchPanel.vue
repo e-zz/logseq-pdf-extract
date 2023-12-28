@@ -2,8 +2,7 @@
   <div class="search-box" :class="[opts.isDark ? 'dark' : 'light']">
     <div class="search-header">
       <input id="zotero-input" v-model="searchText" placeholder="Zotero" @keydown.enter="onEnter"
-        @keydown.esc.prevent="onInputEsc" @keydown.up.prevent="moveSelection(-1)"
-        @keydown.down.prevent="moveSelection(1)" />
+        @keydown.up.prevent="moveSelection(-1)" @keydown.down.prevent="moveSelection(1)" />
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="search-icon" @click="search" height="18px"
         width="18px">
         <path
@@ -15,7 +14,7 @@
       <template #default="{ item, index }">
         <DynamicScrollerItem :item="item">
           <div :key="item.key" class="zotero-list-item" :class="{ 'is-selected': selectedItemIndex === index }"
-            @click="insert(item.key)">
+            @click="event => onClickItem(item.key, event)">
             <div class="title">{{ item.title }}</div>
             <div class="info">{{ item.dateModified }}</div>
           </div>
@@ -68,7 +67,7 @@ const onEnter = async () => {
     if (items.value?.length && items.value?.length > 0) {
       await insert(items.value[selectedItemIndex.value].key);
       //  assume the import and insert is finished. Hide the panel
-      logseq.hideMainUI();
+      logseq.hideMainUI({ restoreEditingCursor: true });
     }
   } else {
     search();
@@ -87,6 +86,12 @@ const search = async () => {
   console.log(res, typeof (res));
 
   items.value = res.filter((item) => !item.parentItem);
+}
+const onClickItem = (key, event) => {
+  insert(key);
+  if (!event.ctrlKey) {
+    logseq.hideMainUI({ restoreEditingCursor: true });
+  }
 }
 // TODO multiple select
 const insert = async (key) => {

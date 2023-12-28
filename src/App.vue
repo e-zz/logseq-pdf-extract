@@ -32,6 +32,7 @@ onMounted(async () => {
 
   logseq.once("ui:visible:changed", ({ visible }) => {
     if (visible) ready.value = true;
+    document.addEventListener("keyup", onKeyUp); // close on ESC
   });
 
   logseq.on("ui:visible:changed", async ({ visible }) => {
@@ -50,11 +51,19 @@ onMounted(async () => {
     }
   });
 });
+const closePanel = (opts: any = { restoreEditingCursor: true }) => {
+  logseq.hideMainUI(opts);
+}
+const onKeyUp = (e) => {
+  if (e.key === "Escape") {
+    closePanel();
+  }
+}
 
 const _onClickOutside = ({ target }) => {
   const inner = target.closest(".container-inner");
 
-  if (!inner) logseq.hideMainUI();
+  if (!inner) closePanel();
 };
 </script>
 
