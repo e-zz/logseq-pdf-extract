@@ -25,6 +25,17 @@ export class Zotero {
       return res
     }
   }
+  static async getSelectedRawItems() {
+    // get items selected in Zotero (not Note) with their attachments
+    let res = await Zapi.getBySelection();
+
+    res = res.map((i) => i.item)
+    if (__debug) {
+      console.log("in getSelectedRaw", res);
+    }
+
+    return res
+  }
   static async getSelected() {
     // get items selected in Zotero (not Note) with their attachments
     let res = ZoteroItems.fromRaw(await Zapi.getBySelection());

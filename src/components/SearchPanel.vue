@@ -1,7 +1,9 @@
 <template>
   <div class="search-box" :class="[opts.isDark ? 'dark' : 'light']">
     <div class="search-header">
-      <input id="zotero-input" v-model="searchText" placeholder="Zotero" @keydown.enter="search" />
+      <input id="zotero-input" v-model="searchText" placeholder="Zotero" @keydown.enter="onEnter"
+        @keydown.esc.prevent="onInputEsc" @keydown.up.prevent="moveSelection(-1)"
+        @keydown.down.prevent="moveSelection(1)" />
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="search-icon" @click="search" height="18px"
         width="18px">
         <path
@@ -9,10 +11,11 @@
       </svg>
     </div>
 
-    <DynamicScroller class="search-list-wrap" :items="items" keyField="key" :min-item-size="54">
-      <template #default="{ item }">
+    <DynamicScroller class="search-list-wrap" ref="scrollerRef" :items="items" keyField="key" :min-item-size="54">
+      <template #default="{ item, index }">
         <DynamicScrollerItem :item="item">
-          <div :key="item.key" class="zotero-list-item" @click="insert(item.key)">
+          <div :key="item.key" class="zotero-list-item" :class="{ 'is-selected': selectedItemIndex === index }"
+            @click="insert(item.key)">
             <div class="title">{{ item.title }}</div>
             <div class="info">{{ item.dateModified }}</div>
           </div>
@@ -23,14 +26,19 @@
 </template>
 
 <script setup lang="ts">
+const __debug = false;
 
 import { Zotero } from '../zotero/zotero'
-import { ref, inject } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 
+const scrollerRef = ref(null);
 const searchText = ref('')
 let items = ref([])
+const selectedItemIndex = ref(0);
 const opts = inject('opts')
+let lastSearch = searchText.value;
+
 console.log(opts.value.isDark);
 
 // for (let i = 0; i < 800; i++) {
@@ -41,27 +49,86 @@ console.log(opts.value.isDark);
 //   });
 // }
 
+onMounted(async () => {
+
+  logseq.on("ui:visible:changed", async ({ visible }) => {
+    if (visible && searchText.value === '') {
+      items.value = await Zotero.getSelectedRawItems();
+      console.log('visible', visible, items.value);
+    }
+  });
+
+})
+
+const onEnter = async () => {
+  // either import or search again
+  const newSearch = searchText.value.trim()
+  console.log(lastSearch, newSearch);
+  if (lastSearch == newSearch) {
+    if (items.value?.length && items.value?.length > 0) {
+      await insert(items.value[selectedItemIndex.value].key);
+      //  assume the import and insert is finished. Hide the panel
+      logseq.hideMainUI();
+    }
+  } else {
+    search();
+    lastSearch = newSearch;
+  }
+}
 const search = async () => {
   // console.log(searchText.value)
-  let res = await Zotero.search(searchText.value)
-  // let res = await Zotero.search('quantum')
-
-  // res.forEach((item) => {
-  //   if (item.title === undefined) console.log(item)
-  // })
+  selectedItemIndex.value = 0;
+  let res;
+  if (searchText.value === '') {
+    res = await Zotero.getSelectedRawItems();
+  } else {
+    res = await Zotero.search(searchText.value)
+  }
+  console.log(res, typeof (res));
 
   items.value = res.filter((item) => !item.parentItem);
-
-  // await nextTick()
-  console.log(res[0]);
-
 }
 // TODO multiple select
 const insert = async (key) => {
-  console.log("clicked item key=", key);
+  if (__debug) console.log("clicked item key=", key);
+
   let res = await Zotero.getByKeys([key,])
   res = await Zotero.safeImportToCursor(res)
+
 }
+
+const onInputEsc = ({ target }) => {
+  const list = target.closest(".search-list-wrap") as HTMLDivElement;
+  console.log(document.querySelector(".search-list-wrap"));
+
+  target.blur();
+  document.querySelector(".search-list-wrap")?.select();
+}
+
+const moveSelection = (direction) => {
+  const scrollTop = scrollerRef.value.$el.scrollTop;
+  const clientHeight = scrollerRef.value.$el.clientHeight;
+  // TODO better way to determine the active range
+  const minItemSize = 54;
+  const firstVisibleIndex = Math.floor(scrollTop / minItemSize);
+  const lastVisibleIndex = Math.ceil((scrollTop + clientHeight) / minItemSize) - 1;
+  const moveUpBound = firstVisibleIndex;
+  const moveLowBound = lastVisibleIndex - 1;
+
+  selectedItemIndex.value = Math.max(
+    0,
+    Math.min(items.value.length - 1, selectedItemIndex.value + direction)
+  );
+  if (selectedItemIndex.value < moveUpBound) {
+    scrollerRef.value.scrollToItem(selectedItemIndex.value);
+  } else if (selectedItemIndex.value > moveLowBound) {
+    scrollerRef.value.scrollToItem(selectedItemIndex.value - (moveLowBound - moveUpBound));
+  }
+
+  // scrollerRef.value.scrollToItem(selectedItemIndex.value);
+  console.log(direction, selectedItemIndex.value);
+
+};
 </script>
 
 <style scoped lang="scss">
@@ -99,6 +166,10 @@ $hover-background: #3e3d3d;
   }
 
   .zotero-list-item:hover {
+    background-color: $hover-background;
+  }
+
+  .is-selected {
     background-color: $hover-background;
   }
 }
@@ -153,6 +224,10 @@ $hover-background: #3e3d3d;
     white-space: nowrap;
     text-wrap: ellipsis;
     // width: 100%;
+  }
+
+  &.is-selected {
+    background-color: #f5f5f5;
   }
 
   .info {
