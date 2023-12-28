@@ -1,6 +1,6 @@
 {
   "name": "logseq-pdf-extract",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/index.html",
   "author": "e-zz",
   "scripts": {
@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@logseq/libs": "^0.0.15",
-    "vue": "^3.2.33",
-    "vue-resizable": "^2.1.7"
+    "vue": "^3.2.33"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "2.0.0",
