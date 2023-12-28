@@ -90,6 +90,13 @@ logseq
       description: 'Invoke the Zotero search panel (default `ctrl+alt+z`). Restart or refresh Logseq to take effect.',
       default: 'mod+alt+z',
     },
+    // {
+    //   key: 'key_search_close',
+    //   type: 'string',
+    //   title: 'Shortcut: close zotero search panel',
+    //   description: 'Close the Zotero search panel (default `ctrl+alt+z`). Restart or refresh Logseq to take effect.',
+    //   default: 'mod+esc',
+    // },
     {
       key: 'insert_button',
       type: 'boolean',

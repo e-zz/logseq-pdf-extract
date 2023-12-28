@@ -10,6 +10,10 @@ function showSearchPanel() {
   logseq.showMainUI();
   return null
 }
+// function closeSearchPanel() {
+//   logseq.hideMainUI();
+//   return null
+// }
 
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
@@ -29,6 +33,13 @@ async function registerShortcuts() {
     },
     showSearchPanel
   );
+  // logseq.App.registerCommandShortcut(
+  //   {
+  //     binding: logseq.settings.key_search_close,
+  //     mode: "editing",
+  //   },
+  //   closeSearchPanel
+  // );
   logseq.App.registerCommand("PDF Extract", {
     key: `import_selected`,
     label: "PDF: import selected Zotero items to cursor",
