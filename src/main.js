@@ -84,6 +84,13 @@ logseq
       default: 'mod+alt+e',
     },
     {
+      key: 'key_search',
+      type: 'string',
+      title: 'Shortcut: show zotero search panel',
+      description: 'Invoke the Zotero search panel (default `ctrl+alt+z`). Restart or refresh Logseq to take effect.',
+      default: 'mod+alt+z',
+    },
+    {
       key: 'insert_button',
       type: 'boolean',
       default: true,

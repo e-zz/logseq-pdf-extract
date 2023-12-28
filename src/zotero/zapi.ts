@@ -11,7 +11,7 @@ export class Zapi {
 
     static API = {
         // SELECTION_GET: this.API_ENDPOINT + "/selection/get",
-        ITEM_ATTACHMENT_GET: this.API_ENDPOINT + "/getFile",
+        ITEM_ATTACHMENT_GET_BY_KEY: this.API_ENDPOINT + "/get",
         SELECTED_ITEM_ATTACHMENT_GET: this.API_ENDPOINT + "/selected",
         LIBRARY_SEARCH: this.API_ENDPOINT + "/search",
         // ITEM_CREATE: this.API_ENDPOINT + "/item/create",
@@ -106,9 +106,15 @@ export class Zapi {
         )
     }
 
-    static async getAttachmentByItemKeys(keys: string[]) {
+    static async getItemByKeys(keys: string[]) {
         return await this.callEndpoint(
-            this.API.ITEM_ATTACHMENT_GET,
+            this.API.ITEM_ATTACHMENT_GET_BY_KEY,
+            keys
+        )
+    }
+    static async getAttachmentByKeys(keys: string[]) {
+        return await this.callEndpoint(
+            this.API.ITEM_ATTACHMENT_GET_BY_KEY,
             keys
         )
     }
@@ -120,7 +126,7 @@ export class Zapi {
     }
     static async test_getAttachmentByKeys() {
         let keys = ["98GXDB7I"];
-        let attachments = await this.getAttachmentByItemKeys(keys);
+        let attachments = await this.getAttachmentByKeys(keys);
         console.log(attachments);
     }
 }

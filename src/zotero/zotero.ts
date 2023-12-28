@@ -40,7 +40,6 @@ export class Zotero {
     // get items selected in Zotero (not Note) with their attachments
     let res = ZoteroItems.fromRaw(await Zapi.getBySelection());
 
-
     if (__debug) {
       console.log("in getSelected", res);
     }
@@ -66,30 +65,34 @@ export class Zotero {
     // TODO rank by time modified
     return queryRes;
   }
-}
 
+  static async safeImportToCursor(items: ZoteroItems) {
+    // import items to cursor
+    // if items is empty, import se
+    await Promise.all(items.map(item => item.page.safeImport()));
+
+    if (await logseq.Editor.checkEditing()) {
+      for (let i = 0; i < items.items.length; i++) {
+
+        let itemPage = items.items[i].page;
+        // TODO option: insert title or page Ref
+        // itemPage.insertTitle();
+        itemPage.insertRef();
+
+        if (logseq.settings.insert_button && itemPage.hasAttachment()) {
+          for (let j = 0; j < itemPage.attachments.length; j++) {
+            let atta = itemPage.attachments[j];
+            if (atta.contentType === 'application/pdf') atta.insertButton()
+          }
+        }
+
+      }
+    }
+  }
+}
 
 export async function importSelectedToCursor() {
   let selected = await Zotero.getSelected();
-
   if (__debug) console.log("in importSelectedToCursor \t selected", selected);
-
-  await Promise.all(selected.map(item => item.page.safeImport()));
-
-  if (await logseq.Editor.checkEditing()) {
-    for (let i = 0; i < selected.items.length; i++) {
-
-      let itemPage = selected.items[i].page;
-      // itemPage.insertTitle();
-      itemPage.insertRef();
-
-      if (logseq.settings.insert_button && itemPage.hasAttachment()) {
-        for (let j = 0; j < itemPage.attachments.length; j++) {
-          let atta = itemPage.attachments[j];
-          if (atta.contentType === 'application/pdf') atta.insertButton()
-        }
-      }
-
-    }
-  }
+  await Zotero.safeImportToCursor(selected);
 }
