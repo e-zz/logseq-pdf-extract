@@ -1,42 +1,61 @@
 # PDF Extract
-## A Quick Guide
+## 1. A Quick Guide
 
 
-### 1. Extract Zotero Items  (Experimental)
+### 1.1 Extract Zotero Items  (Experimental)
 
 > ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working. Also, keep Zotero open while importing.
 
-This function mimics Logseq's `/Zotero` command, but it's fully local. Till now, it supports importing items selected in Zotero. More features are planned.
+This function mimics Logseq's `/Zotero` command, but it's fully local. Till now, it supports importing items selected in Zotero and search in Zotero through a pop-up panel. More features are planned.
+
+- Shortcut `Ctrl+Alt+e` to import items selected in Zotero
+  - [ ] Import selected PDF items or attachments in Zotero
+- Search Panel (`Ctrl+Alt+z` or slash command `/PDF: show search panel`)
+  - [x] Search in Zotero and import items as Logseq pages
+  - [x] Import items selected in Zotero as Logseq pages
+  - [ ] ❓ support Zotero search syntax
+  - [ ] UI: allow users to select attachments
+- [ ] UI: show recent items in Zotero
+- [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
 
 #### Import items already selected in Zotero 
-Use `Ctrl+Alt+e` to import items selected in Zotero. The items will be imported as Logseq pages.
+To import selected items from Zotero as Logseq pages, use the `Ctrl+Alt+e` shortcut. This can be particularly useful if you wish to open a file that has just been added to Zotero via the Zotero Connector, or if you need to import several items simultaneously.
 
 ![demonstration](importSelected.gif)
 
 - Option: turn off the automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
 - Slash command: `/PDF Extract: import items selected in Zotero`
-- [ ] import selected PDF files in Zotero
+- It's also possible to import through the search box: see [Search Panel](#search-panel) 
 
-#### Show Recent Items in Zotero
-To be implemented
-- [ ] UI: show recent items in Zotero
-- [ ] UI: allow users to select items or attachments in the list by clicking 
-- [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
 
-#### Search Box 
+#### Search Panel 
+Use `Ctrl+Alt+z` or slash command `/PDF: show search panel`.  This is designed to be a complete replacement of Logseq's `/Zotero` command. The backend is powered directly by Zotero so [ZotServer](https://github.com/e-zz/ZotServer/releases) is necessary.
+
+![search](searchPanel.gif)
+
+- On showing up, it will list those items selected in Zotero. (This only works after the first run. See [Known Issues](#known-issues))
+- Type keywords and press `Enter` to search. 
+- Use up/down arrow keys to navigate the list and `Enter` to import. Or directly click on the item.
+- The item will be imported as a page if no duplicate page is found in Logseq. 
+
+This hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
+
 To be implemented
-- [ ] UI: search box to interact with Zotero
-- [ ] import by clicking
+- [ ] ❓ support Zotero search syntax
 
 #### Notes
 Not currently planned. But PRs are welcome.
 
-### 2. Annotation Extraction
-Use `Ctrl+Alt+i` to get the original text of the reference to annotation block. A template is provided to customize the style of the inserted text. See [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) for more details.
+### 1.2 Annotation Extraction
+Use `Ctrl+Alt+i` to get the original text of the reference to annotation block.
+#### Get Excerpts of PDF Text Highlights
+Sometimes it's preferred to keep both the ref and the highlighted text. This plugin provides a shortcut to extract the excerpt of the text highlights while keeping the original references.  
+
+A template is provided to customize the style of the inserted text. See [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) for more details.
 
 <!-- TODO explain the pdf-ref property -->
 
-### TeX OCR of Area Highlights
+#### TeX OCR of Area Highlights
 Inspired by [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-formula-ocr-plugin), this plugin helps to extract TeX from area highlights.
 
 > ❗ **For new users: API token** The OCR service from Hugging Face is used.
@@ -51,15 +70,15 @@ Inspired by [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-fo
 
 
 Two ways are provided to extract TeX from area highlights: button and shortcut.
-#### Button: Copy TeX to clipboard
+##### Button: Copy TeX to clipboard
 On the area highlights, a button named `copy as TeX` is provided to copy TeX to clipboard.  
 <img src="areaHL.png" width="200" >
 
 
-#### Shortcut: Insert TeX into the Block
+##### Shortcut: Insert TeX into the Block
 Use `Ctrl+Alt+i` to insert TeX string into the block. A template is provided to customize the style of the inserted TeX. See [Template for TeX OCR](#area_style-template-for-inserting-tex) for more details.
 
-### 3. PDF Open Button (Experimental)
+### 1.3 PDF Open Button (Experimental)
 With [Zotero integration](https://docs.logseq.com/#/page/zotero) enalbed, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
 <br>
 <img src="pdfOpenButton.png" width="250" >
@@ -77,7 +96,7 @@ Personally, I love this hack because in principle by creating mutli-profiles, we
 >
 > And maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking the reading progress.
 
-## Settings
+## 2. Settings
 #### `insert_button`: insert PDF open button when importing Zotero items
 If enabled, when importing Zotero items, the plugin will insert a PDF open button if the item has a PDF attachment. Notice that it will insert multiple buttons if more than one PDF attachment is found.
 
@@ -95,6 +114,10 @@ When inserting TeX, one could customize the style by a template. In the template
 ```
 > For example, if you need to replace the original area highlights with TeX, then use `$$tex$$` as the template. More complex template with hiccup syntax should be possible, but I haven't tested it.
 
+# Known Issues
+
+- [ ] The first time you use the search box, it will not show what has been selected in Zotero. A workaround is to open the search box twice.
+
 # Acknowledgements
 TeX OCR
 - olmobaldoni: [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-formula-ocr-plugin)
@@ -108,6 +131,9 @@ Zotero API
 
 Icon
 - Mcrosoft Bing: [Designer](https://www.bing.com/images/create/)
+
+Search Panel GUI
+- xyhp915: [logseq-assets-plus](https://github.com/xyhp915/logseq-assets-plus)
 
 Coding Assistance
 - GitHub Copilot
