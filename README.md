@@ -2,14 +2,14 @@
 ## 1. A Quick Guide
 
 
-### 1.1 Extract Zotero Items  (Experimental)
+### 1.1 Import Zotero Items  (Experimental)
 
 > ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working. Also, keep Zotero open while importing.
 
-This function mimics Logseq's `/Zotero` command, but it's fully local. Till now, it supports importing items selected in Zotero and search in Zotero through a pop-up panel. More features are planned.
+This function serves as a local equivalent to Logseq's /Zotero command. Currently, it supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned and PRs welcome.
 
 - Shortcut `Ctrl+Alt+e` to import items selected in Zotero
-  - [ ] Import selected PDF items or attachments in Zotero
+  - [ ] Import selected PDF items (or single attachment of an item) in Zotero
 - Search Panel (`Ctrl+Alt+z` or slash command `/PDF: show search panel`)
   - [x] Search in Zotero and import items as Logseq pages
   - [x] Import items selected in Zotero as Logseq pages
@@ -29,19 +29,23 @@ To import selected items from Zotero as Logseq pages, use the `Ctrl+Alt+e` short
 
 
 #### Search Panel 
-Use `Ctrl+Alt+z` or slash command `/PDF: show search panel`.  This is designed to be a complete replacement of Logseq's `/Zotero` command. The backend is powered directly by Zotero so [ZotServer](https://github.com/e-zz/ZotServer/releases) is necessary.
+> ❗ Search panel hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
+
+To activate the search panel, use `Ctrl+Alt+z` or slash command `/PDF: show search panel`.  This feature is intended to serve as a local alternative to the `/Zotero` command in Logseq. It directly interfaces with Zotero via [ZotServer](https://github.com/e-zz/ZotServer/releases).
+
+- On showing up, it will list those items selected in Zotero by default. (This only works after the first run. See [Known Issues](#known-issues))
+- Type keywords and press `Enter` to search. 
+- Use up/down arrow keys to navigate the list and `Enter` to import. Or directly click on the item.
+    - `ctrl+click` to select multiple items
+- The items will be imported as Logseq pages if no duplicate page found. 
 
 ![search](searchPanel.gif)
 
-- On showing up, it will list those items selected in Zotero. (This only works after the first run. See [Known Issues](#known-issues))
-- Type keywords and press `Enter` to search. 
-- Use up/down arrow keys to navigate the list and `Enter` to import. Or directly click on the item.
-- The item will be imported as a page if no duplicate page is found in Logseq. 
 
-This hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
-
-To be implemented
-- [ ] ❓ support Zotero search syntax
+**To be implemented**
+- [ ] ❓ support additional [Zotero search features](https://www.zotero.org/support/dev/client_coding/javascript_api)
+  - [Zotero search fields](https://www.zotero.org/support/dev/client_coding/javascript_api/search_fields)
+  - [Zotero search syntax](https://github.com/zotero/zotero/blob/b31f66ddbdc59cdf97966a392f510ed0afff706f/chrome/content/zotero/xpcom/data/searchConditions.js)
 
 #### Notes
 Not currently planned. But PRs are welcome.
@@ -92,9 +96,9 @@ Here is how we could take advantage of it:
 > **Caution!** Buttons are delicate. If Logseq cannot find a PDF specified by the button, it may crash (possible data loss). Dynamical update might be implemented in the future. But no easy solutions so far. One idea is to record Zotero item key to update the button from Zotero. PRs or ideas are welcome.
 
 > **How it works and when to use it.**
-Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. But this feature relies on [this PR](https://github.com/logseq/logseq/pull/10430). Till now, this function can only be used as an alternative to copy a button that already exists in Zotero item page `@xxx` by hands.
+Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. However, this feature depends on the enhancements to the multi-profile feature, as proposed in [this PR](https://github.com/logseq/logseq/pull/10430). Without it, it's better to ignore this function till now.
 >
-> And maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF. This would be useful for note-taking or tracking the reading progress.
+> Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF, or even "non-highlight" button that eliminates the need for highlighting. And if you have any ideas, PRs are welcome.
 
 ## 2. Settings
 #### `insert_button`: insert PDF open button when importing Zotero items
@@ -117,6 +121,7 @@ When inserting TeX, one could customize the style by a template. In the template
 # Known Issues
 
 - [ ] The first time you use the search box, it will not show what has been selected in Zotero. A workaround is to open the search box twice.
+- [ ] Occasionally the arrow keys don't work in the search box. A workaround is to use the mouse. It should be fixed after Logseq restarts or refreshes.
 
 # Acknowledgements
 TeX OCR
@@ -151,3 +156,5 @@ Both projects are not only feature-rich but also continue to evolve through acti
 - Install dependencies with `npm install`
 - Build the application using `npm run build` or `npm run watch`
 - Load the plugin in the Logseq Desktop client using the `Load unpacked plugin` option.
+
+> ❗ **Notice:** Unfortunately, the dependency `vue-virtual-scroller` does not work well with `vite run --watch` or `npm run watch` in the `pacakge.json`. Use `npm run build` instead. Please help if you know how to fix it.
