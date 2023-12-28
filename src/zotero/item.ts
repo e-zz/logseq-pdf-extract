@@ -7,6 +7,7 @@ export class ZoteroItem {
 
   raw: ZoteroModel.Item.Any;
   page: Page;
+  key: string;
   // use more specific ZoteroItem.fromRaw() instead
   constructor() {
   }
@@ -29,6 +30,7 @@ export class ZoteroItem {
 
     let zoteroItem = new ZoteroItem();
     zoteroItem.raw = raw
+    zoteroItem.key = raw.key;
     zoteroItem.page = Page.fromRaw(raw);
     return zoteroItem
   }
@@ -157,5 +159,8 @@ export class ZoteroItems {
 
   map(func: (item: ZoteroItem) => any) {
     return this.items.map(func);
+  }
+  filter(func: (item: ZoteroItem) => boolean) {
+    return this.items.filter(func);
   }
 }
