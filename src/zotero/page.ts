@@ -128,11 +128,13 @@ export class Page implements ZoteroPage {
   }
 
   async importAbstract() {
+    if (!this.abstract) return;
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Abstract]]")
     logseq.Editor.insertBlock(block.uuid, this.abstract)
   }
 
   async importAttachments() {
+    if (!this.hasAttachment()) return;
     let block = await logseq.Editor.appendBlockInPage(this.title, "[[Attachments]]")
 
     this.attachments.forEach(attachment => { logseq.Editor.insertBlock(block.uuid, attachment.pageEntry()) })

@@ -10,7 +10,6 @@
 
 import Item from "./components/SearchPanel.vue";
 import { ref, onMounted, provide } from 'vue';
-import VueResizable from "vue-resizable";
 
 const __debug = false;
 let ready = ref(false);
