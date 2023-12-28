@@ -38,7 +38,7 @@ const selectedItemIndex = ref(0);
 const opts = inject('opts')
 let lastSearch = searchText.value;
 
-console.log(opts.value.isDark);
+if (__debug) console.log(opts.value.isDark);
 
 // for (let i = 0; i < 800; i++) {
 //   items.value.push({
@@ -53,7 +53,6 @@ onMounted(async () => {
   logseq.on("ui:visible:changed", async ({ visible }) => {
     if (visible && searchText.value === '') {
       items.value = await Zotero.getSelectedRawItems();
-      console.log('visible', visible, items.value);
     }
   });
 
@@ -62,7 +61,7 @@ onMounted(async () => {
 const onEnter = async () => {
   // either import or search again
   const newSearch = searchText.value.trim()
-  console.log(lastSearch, newSearch);
+  if (__debug) console.log(lastSearch, newSearch);
   if (lastSearch == newSearch) {
     if (items.value?.length && items.value?.length > 0) {
       await insert(items.value[selectedItemIndex.value].key);
@@ -83,8 +82,6 @@ const search = async () => {
   } else {
     res = await Zotero.search(searchText.value)
   }
-  console.log(res, typeof (res));
-
   items.value = res.filter((item) => !item.parentItem);
 }
 const onClickItem = (key, event) => {
@@ -100,14 +97,6 @@ const insert = async (key) => {
   let res = await Zotero.getByKeys([key,])
   res = await Zotero.safeImportToCursor(res)
 
-}
-
-const onInputEsc = ({ target }) => {
-  const list = target.closest(".search-list-wrap") as HTMLDivElement;
-  console.log(document.querySelector(".search-list-wrap"));
-
-  target.blur();
-  document.querySelector(".search-list-wrap")?.select();
 }
 
 const moveSelection = (direction) => {
@@ -131,7 +120,7 @@ const moveSelection = (direction) => {
   }
 
   // scrollerRef.value.scrollToItem(selectedItemIndex.value);
-  console.log(direction, selectedItemIndex.value);
+  if (__debug) console.log(direction, selectedItemIndex.value);
 
 };
 </script>

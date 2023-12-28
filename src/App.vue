@@ -20,8 +20,6 @@ let opts = ref({
 });
 provide("opts", opts);
 
-console.log(opts);
-
 onMounted(async () => {
   const c = await logseq.App.getUserConfigs();
   opts.value.isDark = c.preferredThemeMode === "dark";
