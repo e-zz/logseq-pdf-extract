@@ -6,6 +6,11 @@ import { extractEditor } from "./utils/extractBlock";
 const __debug = false;
 
 
+function showSearchPanel() {
+  logseq.showMainUI();
+  return null
+}
+
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
     key: `extract_annotations_in_selected_blocks`,
@@ -17,13 +22,13 @@ async function registerShortcuts() {
   },
     extractEditor
   );
-  // logseq.App.registerCommandShortcut(
-  //   {
-  //     binding: logseq.settings.key_import,
-  //     mode: "editing",
-  //   },
-  //   () => importSelectedToCursor()
-  // );
+  logseq.App.registerCommandShortcut(
+    {
+      binding: logseq.settings.key_search,
+      mode: "editing",
+    },
+    showSearchPanel
+  );
   logseq.App.registerCommand("PDF Extract", {
     key: `import_selected`,
     label: "PDF: import selected Zotero items to cursor",
@@ -36,10 +41,6 @@ async function registerShortcuts() {
   )
 }
 
-function showSearchBox() {
-  logseq.showMainUI();
-  return null
-}
 
 async function registerSlashCommand() {
   logseq.Editor.registerSlashCommand(
@@ -51,8 +52,8 @@ async function registerSlashCommand() {
     () => importSelectedToCursor()
   );
   logseq.Editor.registerSlashCommand(
-    "PDF: show search box",
-    showSearchBox
+    "PDF: show search panel",
+    showSearchPanel
   );
 }
 
