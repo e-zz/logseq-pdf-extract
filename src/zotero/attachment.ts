@@ -26,14 +26,19 @@ export class Attachment {
     file.contentType = raw.contentType;
     file.localLink = `zotero://select/library/items/${raw.key}`;
 
-    if (file.linkMode === "imported_file") {
+    switch (file.linkMode) {
+      case "imported_file":
       file.baseName = raw.filename;
       file.relPath = raw.filename;
       file.button = buttonImportedFile(file.key, file.relPath);
-    } else {  // "linked_file"
-      file.baseName = raw.path.split(/[:\/]/).pop();
+        break;
+      case "linked_file":
+        file.baseName = raw.path.split(/[:\/]/).pop(); // Warn: The name of a PDF could be different from it's raw.title
       file.relPath = raw.path.replace("attachments:", "");
       file.button = buttonLinkedFile(file.relPath);
+        break;
+      default:
+        console.log(`Unhandled linkMode ${file.linkMode} for ${file.localLink}`);
     }
 
     return file
