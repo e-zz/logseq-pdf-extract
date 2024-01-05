@@ -53,24 +53,28 @@ async function extractRef(uuid) {
   }
 
   const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
+  const ls_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
 
   if (__debug) {
     console.log("extract uuid", uuid);
     console.log("\t hl_type ", hl_type);
+    console.log("\t ls_type ", ls_type);
   }
 
-  if (hl_type == "annotation") {
+  if (ls_type && !hl_type) {
+
     return prop_uuid + formatStyle(ref_content)
+
+  } else if (hl_type == "area") {
+
+    let prop_ocr = await readOcr(uuid);
+    if (prop_ocr == "") {
+      prop_ocr = await updateOcr(uuid);
+    }
+    return wrapAreaIdTex(prop_ocr, uuid)
+
   }
 
-  let prop_ocr = await readOcr(uuid);
-  // if (hl_type == "area") {
-  // if (ref_content.startsWith("[:span]")) {
-  if (prop_ocr == "") {
-    prop_ocr = await updateOcr(uuid);
-  }
-  return wrapAreaIdTex(prop_ocr, uuid)
-  // }
 }
 
 const pattern_block_ref = /\(\(([\w-]*?)\)\)/g;
