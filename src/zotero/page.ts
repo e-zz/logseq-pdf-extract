@@ -42,6 +42,9 @@ export class Page implements ZoteroPage {
     let props = {};
     let attachments;
     let abstract;
+
+    const qAlias: boolean = logseq.settings?.alias_citationKey
+
     // TODO note 
     // let notes = {}; 
     if (__debug) console.log("in fromRaw", rawData);
@@ -68,6 +71,11 @@ export class Page implements ZoteroPage {
           break;
         case 'abstractNote':
           abstract = value;
+          break;
+        case 'citationKey':
+          if (qAlias) {
+            props['alias'] = wrapTag(value);
+          }
           break;
         default:
           // remove unwanted keys
@@ -99,6 +107,19 @@ export class Page implements ZoteroPage {
 
   hasAttachment() {
     return this.attachments && this.attachments.length > 0;
+  }
+
+  insertAliasRef() {
+    logseq.Editor.insertAtEditingCursor(this.props['alias']);
+  }
+
+  safeInsertAliasRef() {
+    // alias is optional
+    if (this.props['alias'] == undefined) {
+      this.insertRef();
+      return
+    }
+    this.insertAliasRef();
   }
 
   insertRef() {

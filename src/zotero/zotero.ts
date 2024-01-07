@@ -72,12 +72,22 @@ export class Zotero {
     await Promise.all(items.map(item => item.page.safeImport()));
 
     if (await logseq.Editor.checkEditing()) {
+
+      let qAlias = logseq.settings?.alias_citationKey;
+
+      if (__debug) console.log("q_alias", qAlias);
+
       for (let i = 0; i < items.items.length; i++) {
 
         let itemPage = items.items[i].page;
         // TODO option: insert title or page Ref
         // itemPage.insertTitle();
-        itemPage.insertRef();
+
+        if (qAlias) {
+          itemPage.safeInsertAliasRef();
+        } else {
+          itemPage.insertRef();
+        }
 
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
           for (let j = 0; j < itemPage.attachments.length; j++) {

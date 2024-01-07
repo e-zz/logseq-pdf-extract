@@ -15,12 +15,16 @@ export class ZoteroItem {
   // @arg raw: raw data from Zotero API (Zapi)
   static fromRaw(rawData: any): ZoteroItem {
 
-    let { item: raw, attachments } = rawData;
-    // It might change accordingly if the return format of Zapi changes
+    let { item: raw, attachments, citationKey } = rawData;
 
+    // It might change accordingly if the return format of Zapi changes
 
     if (raw.tags) {
       raw.tags = raw.tags.map((tag: any) => tag.tag);
+    }
+
+    if (citationKey) {
+      raw.citationKey = citationKey;
     }
 
     if (attachments) {
