@@ -90,7 +90,7 @@ const onClickItem = (key, event) => {
     logseq.hideMainUI({ restoreEditingCursor: true });
   }
 }
-// TODO multiple select
+// TODO better multiple select
 const insert = async (key) => {
   if (__debug) console.log("clicked item key=", key);
 

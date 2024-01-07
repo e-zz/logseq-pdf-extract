@@ -1,54 +1,44 @@
-# PDF Extract
-## 1. A Quick Guide
+<h1><img src="icon.png" alt="Alt text" width="40" height="40"> Logseq PDF Extract </h1>
 
+## 🛠 Installation
+Search for "PDF Extract" in the Logseq plugin store and install it. Or you could install it manually by downloading the latest release from [GitHub Releases](https://github.com/e-zz/logseq-pdf-extract/releases/latest).
+
+> ❗ **To enable Zotero-related features** 
+> - It's also necessary to install [ZotServer](https://github.com/e-zz/ZotServer/releases/latest) plugin in Zotero. Check [Zotero Documentation](https://www.zotero.org/support/plugins) to learn how to install Zotero plugins.
+> - If ZotServer is successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
+> - Zotero must be open while using this feature.
+
+## 🚀 A Quick Guide
 
 ### 1.1 Import Zotero Items  (Experimental)
 
-> ❗ **Requirement:** To use it, you need to install [ZotServer](https://github.com/e-zz/ZotServer/releases) plugin in Zotero. No extra configuration is needed. After installation, open `http://localhost:23119/` in your browser. If you see `No endpoint found`, then it's working. Also, keep Zotero open while importing.
+This function serves as a local equivalent to Logseq's `/Zotero` command. Currently, it supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned and PRs welcome. Better BibTeX citation key is also imported (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
 
-This function serves as a local equivalent to Logseq's /Zotero command. Currently, it supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned and PRs welcome.
-
-- Shortcut `Ctrl+Alt+e` to import items selected in Zotero
-  - [ ] Import selected PDF items (or single attachment of an item) in Zotero
-- Search Panel (`Ctrl+Alt+z` or slash command `/PDF: show search panel`)
-  - [x] Search in Zotero and import items as Logseq pages
-  - [x] Import items selected in Zotero as Logseq pages
-  - [ ] ❓ support Zotero search syntax
-  - [ ] UI: allow users to select attachments
-- [ ] UI: show recent items in Zotero
-- [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
-
-#### Import items already selected in Zotero 
-To import selected items from Zotero as Logseq pages, use the `Ctrl+Alt+e` shortcut. This can be particularly useful if you wish to open a file that has just been added to Zotero via the Zotero Connector, or if you need to import several items simultaneously.
+- Import items selected in Zotero: 
+  - Press `Ctrl+Alt+e` or type `/PDF: import selected Zotero items at cursor` 
+  - Selected Zotero Items => Logseq pages
+  - Use case: 
+    - import items that have just been added to Zotero from browser via the Zotero Connector
+    - import multiple items simultaneously
+  - Option: turn off the automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
 
 ![demonstration](importSelected.gif)
 
-- Option: turn off the automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
-- Slash command: `/PDF Extract: import items selected in Zotero`
-- It's also possible to import through the search box: see [Search Panel](#search-panel) 
-
-
-#### Search Panel 
-> ❗ Search panel hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
-
-To activate the search panel, use `Ctrl+Alt+z` or slash command `/PDF: show search panel`.  This feature is intended to serve as a local alternative to the `/Zotero` command in Logseq. It directly interfaces with Zotero via [ZotServer](https://github.com/e-zz/ZotServer/releases).
-
-- On showing up, it will list those items selected in Zotero by default. (This only works after the first run. See [Known Issues](#known-issues))
-- Type keywords and press `Enter` to search. 
-- Use up/down arrow keys to navigate the list and `Enter` to import. Or directly click on the item.
-    - `ctrl+click` to select multiple items
-- The items will be imported as Logseq pages if no duplicate page found. 
+- Show search panel: 
+  - Press `Ctrl+Alt+z` or type `/PDF: show search panel`
+  - Search items by titles (press `Enter` to execute a search).
+  - Use mouse or arrow keys to scroll the results.
+  - Press `Enter` or click to insert an item at cursor.
+      - `ctrl+click` to insert multiple items
+  - The items inserted will also be imported into Logseq if no duplicate page found (just like `/Zotero`).
+  - And on showing up, by default it will list items selected in Zotero.  (But this does not work at the first run after Logseq is opened or refreshed. See [Known Issues](#known-issues))
 
 ![search](searchPanel.gif)
 
+> ❗ Search panel hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
 
-**To be implemented**
-- [ ] ❓ support additional [Zotero search features](https://www.zotero.org/support/dev/client_coding/javascript_api)
-  - [Zotero search fields](https://www.zotero.org/support/dev/client_coding/javascript_api/search_fields)
-  - [Zotero search syntax](https://github.com/zotero/zotero/blob/b31f66ddbdc59cdf97966a392f510ed0afff706f/chrome/content/zotero/xpcom/data/searchConditions.js)
-
-#### Notes
-Not currently planned. But PRs are welcome.
+> About importing notes: 
+> Not currently planned. But PRs are welcome.
 
 ### 1.2 Annotation Extraction
 Use `Ctrl+Alt+i` to get the original text of the reference to annotation block.
@@ -83,7 +73,7 @@ On the area highlights, a button named `copy as TeX` is provided to copy TeX to 
 Use `Ctrl+Alt+i` to insert TeX string into the block. A template is provided to customize the style of the inserted TeX. See [Template for TeX OCR](#area_style-template-for-inserting-tex) for more details.
 
 ### 1.3 PDF Open Button (Experimental)
-With [Zotero integration](https://docs.logseq.com/#/page/zotero) enalbed, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
+With [Zotero integration](https://docs.logseq.com/#/page/zotero) enabled, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
 <br>
 <img src="pdfOpenButton.png" width="250" >
 <br>
@@ -100,11 +90,18 @@ Personally, I love this hack because in principle by creating mutli-profiles, we
 >
 > Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF, or even "non-highlight" button that eliminates the need for highlighting. And if you have any ideas, PRs are welcome.
 
-## 2. Settings
+## ⚙ 2. Settings
 #### `insert_button`: insert PDF open button when importing Zotero items
 If enabled, when importing Zotero items, the plugin will insert a PDF open button if the item has a PDF attachment. Notice that it will insert multiple buttons if more than one PDF attachment is found.
 
 If you don't want this behavior, tick it off. 
+
+#### `alias_citationKey` (Experimental)
+It's quite common to use [Better BibTeX](https://github.com/retorquere/zotero-better-bibtex/) to manage BibTeX keys in Zotero.
+
+If this option is on, the citation key will be used as the `alias` property of an item page.  
+> For example, if the citation key is `Smith2021`, then the item page will have property `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
+
 #### `excerpt_style`: Template for Annotation Excerpts
 This template defines the style of the inserted text. In the template, `{{excerpt}}` is provided as a placeholder, which will be replaced by the excerpt. The default template is
 ``` 
@@ -117,6 +114,30 @@ When inserting TeX, one could customize the style by a template. In the template
 ((uuid))\n$$tex$$
 ```
 > For example, if you need to replace the original area highlights with TeX, then use `$$tex$$` as the template. More complex template with hiccup syntax should be possible, but I haven't tested it.
+
+# Possible Improvements
+
+Import as Logseq pages:
+- [ ] PDF items (PDF without a parent item)
+
+Import at cursor:
+- [ ] Import specific attachment as a button
+
+Search Panel:
+  - [ ] UI: allow users to select attachments
+  - [ ] UI: show recent items in Zotero
+
+Search Syntax:
+  - [ ] ❓ support additional [Zotero search features](https://www.zotero.org/support/dev/client_coding/javascript_api)
+    - [Zotero search fields](https://www.zotero.org/support/dev/client_coding/javascript_api/search_fields)
+    - [Zotero search syntax](https://github.com/zotero/zotero/blob/b31f66ddbdc59cdf97966a392f510ed0afff706f/chrome/content/zotero/xpcom/data/searchConditions.js)
+
+---
+Proof of concept:
+- [ ] ❓ Full-text search across PDFs and open matched pages in Logseq
+- [ ] ❓ two-way sync: tags, title, etc.
+- [ ] ❓ support Zotero search syntax
+- [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
 
 # Known Issues
 
@@ -135,7 +156,7 @@ Zotero API
 - cboulanger: [excite-docker](https://github.com/cboulanger/excite-docker)
 
 Icon
-- Mcrosoft Bing: [Designer](https://www.bing.com/images/create/)
+- Microsoft Bing: [Designer](https://www.bing.com/images/create/)
 
 Search Panel GUI
 - xyhp915: [logseq-assets-plus](https://github.com/xyhp915/logseq-assets-plus)
@@ -157,4 +178,4 @@ Both projects are not only feature-rich but also continue to evolve through acti
 - Build the application using `npm run build` or `npm run watch`
 - Load the plugin in the Logseq Desktop client using the `Load unpacked plugin` option.
 
-> ❗ **Notice:** Unfortunately, the dependency `vue-virtual-scroller` does not work well with `vite run --watch` or `npm run watch` in the `pacakge.json`. Use `npm run build` instead. Please help if you know how to fix it.
+> ❗ **Notice:** Unfortunately, the dependency `vue-virtual-scroller` does not work well with `vite run --watch` or `npm run watch` in the `package.json`. Use `npm run build` instead. Please help if you know how to fix it.

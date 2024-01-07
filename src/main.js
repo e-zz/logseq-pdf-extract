@@ -77,10 +77,17 @@ function main() {
 logseq
   .useSettingsSchema([
     {
+      key: 'group Zotero',
+      title: "📚 Access Zotero",
+      description: "",
+      type: "heading",
+      default: null,
+    },
+    {
       key: 'key_import',
       type: 'string',
       title: 'Shortcut: import items selected in Zotero',
-      description: 'Import seleceted Zotero items (default `ctrl+alt+e`). Restart or refresh Logseq to take effect.',
+      description: 'Import selected Zotero items (default `ctrl+alt+e`). Restart or refresh Logseq to take effect.',
       default: 'mod+alt+e',
     },
     {
@@ -103,6 +110,13 @@ logseq
       default: false,
       title: 'Option (Experimental): use BetterBibTeX citationKey as page alias',
       description: 'If you use [BetterBibTeX](https://github.com/retorquere/zotero-better-bibtex), you can choose `citationKey` as page alias. Search importation is also affected: `[[citationKey]]` will be used when importing items at cursor. (Recommend: off)',
+    },
+    {
+      key: 'group extract',
+      title: "🧷 Convert PDF ref into text",
+      description: "",
+      type: "heading",
+      default: null,
     },
     {
       key: 'key_convert',
