@@ -12,7 +12,9 @@ Search for "PDF Extract" in the Logseq plugin store and install it. Or you could
 
 ### 1.1 Import Zotero Items  (Experimental)
 
-This function serves as a local equivalent to Logseq's `/Zotero` command. Currently, it supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned and PRs welcome. Better BibTeX citation key is also imported (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
+This function serves as a local equivalent to Logseq's . For a comparison between this and Logseq's native `/Zotero` command, see [#4](https://github.com/e-zz/logseq-pdf-extract/issues/4).
+
+Currently, this plugin supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned (see [here](#possible-improvements) PRs are welcome). Alos, Better BibTeX citation key can be imported. (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
 
 - Import items selected in Zotero: 
   - Press `Ctrl+Alt+e` or type `/PDF: import selected Zotero items at cursor` 
@@ -20,7 +22,7 @@ This function serves as a local equivalent to Logseq's `/Zotero` command. Curren
   - Use case: 
     - import items that have just been added to Zotero from browser via the Zotero Connector
     - import multiple items simultaneously
-  - Option: turn off the automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
+  - Option: turn off automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
 
 ![demonstration](importSelected.gif)
 
@@ -138,6 +140,10 @@ Proof of concept:
 - [ ] ❓ two-way sync: tags, title, etc.
 - [ ] ❓ support Zotero search syntax
 - [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
+
+--- Not planned yet
+- [ ] Notes and two-way sync
+- [ ] Item page customization: e.g., Org-mode support
 
 # Known Issues
 
