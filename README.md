@@ -12,9 +12,9 @@ Search for "PDF Extract" in the Logseq plugin store and install it. Or you could
 
 ### 1.1 Import Zotero Items  (Experimental)
 
-This function serves as a local equivalent to Logseq's . For a comparison between this and Logseq's native `/Zotero` command, see [#4](https://github.com/e-zz/logseq-pdf-extract/issues/4).
+This function serves as a local equivalent to Logseq's . For a comparison between this and Logseq's native `/Zotero` command, see [#6](https://github.com/e-zz/logseq-pdf-extract/discussions/6).
 
-Currently, this plugin supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned (see [here](#possible-improvements) PRs are welcome). Alos, Better BibTeX citation key can be imported. (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
+Currently, this plugin supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned (see [here](#possible-improvements) PRs are welcome). Also, Better BibTeX citation key can be imported. (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
 
 - Import items selected in Zotero: 
   - Press `Ctrl+Alt+e` or type `/PDF: import selected Zotero items at cursor` 
@@ -99,9 +99,9 @@ If enabled, when importing Zotero items, the plugin will insert a PDF open butto
 If you don't want this behavior, tick it off. 
 
 #### `alias_citationKey` (Experimental)
-It's quite common to use [Better BibTeX](https://github.com/retorquere/zotero-better-bibtex/) to manage BibTeX keys in Zotero.
+It's quite common to use [Better BibTeX](https://github.com/retorquere/zotero-better-bibtex/) to manage BibTeX keys in Zotero. 
 
-If this option is on, the citation key will be used as the `alias` property of an item page.  
+If this option is on, the citation key will be used as the `alias` property of an item page.  (Inspired by [sawhney17/logseq-citation-manager](https://github.com/sawhney17/logseq-citation-manager))
 > For example, if the citation key is `Smith2021`, then the item page will have property `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
 
 #### `excerpt_style`: Template for Annotation Excerpts
