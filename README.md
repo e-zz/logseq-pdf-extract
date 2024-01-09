@@ -3,14 +3,44 @@
 ## 🛠 Installation
 Search for "PDF Extract" in the Logseq plugin store and install it. Or you could install it manually by downloading the latest release from [GitHub Releases](https://github.com/e-zz/logseq-pdf-extract/releases/latest).
 
-> ❗ **To enable Zotero-related features** 
-> - It's also necessary to install [ZotServer](https://github.com/e-zz/ZotServer/releases/latest) plugin in Zotero. Check [Zotero Documentation](https://www.zotero.org/support/plugins) to learn how to install Zotero plugins.
-> - If ZotServer is successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
-> - Zotero must be open while using this feature.
+If you are using this plugin for the first time, follow these steps after installation:
+<details>
+  <summary>❗ Enabling TeX OCR</summary>
+
+- To use the OCR service from Hugging Face,
+
+  1. Obtain a [Hugging Face API token](https://huggingface.co/settings/tokens)
+  2. Paste your API key to the `HuggingFace User Access Token` field in the plugin settings.
+- The API is free. But the service has a warm-up time. So the first OCR might take around 1 minute. After that, it should be fast.
+</details>
+
+
+<details>
+  <summary>❗ To enable Zotero-related features </summary>
+
+- On Zotero's side, it's necessary to install the latest version of [ZotServer](https://github.com/e-zz/ZotServer/releases/latest).
+  - To learn how to install Zotero plugins, check [Zotero Documentation](https://www.zotero.org/support/plugins).
+  - If ZotServer is successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
+  - Zotero must be open while using this feature.
+</details>
+
+If the `/Zotero` command is already working as expected, then you're good to go! 🎉 
+
+**If the `/Zotero` command not working**:
+<details>
+  <summary> Please follow this to ensure PDFs <code>open</code> buttons work well! (Recommended)</summary>
+  
+> - Go to Logseq and find the Zotero integration settings. 
+>   - See [Zotero Integration](https://docs.logseq.com/#/page/zotero) for more guidance.
+>   - Your Zotero profiles, like `Zotero API key` and so on, are not accessible by plugins, which means they are not required for this plugin. Consequently, this plugin will never be affected by any modification in profiles.
+> - To ensure the PDF `open` buttons work well and prevent Logseq from crashing, you must set up your Zotero profile with the paths outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9):
+>   - `Zotero data directory` for imported PDF attachment 
+>   - or `Linked Attachment Base Directory` for linked PDF attachment. 
+</details>
 
 ## 🚀 A Quick Guide
 
-### 1.1 Import Zotero Items  (Experimental)
+###  1. Import Zotero Items  📚
 
 This function serves as a local equivalent to Logseq's . For a comparison between this and Logseq's native `/Zotero` command, see [#6](https://github.com/e-zz/logseq-pdf-extract/discussions/6).
 
@@ -42,39 +72,61 @@ Currently, this plugin supports quick importing of items selected in Zotero or i
 > About importing notes: 
 > Not currently planned. But PRs are welcome.
 
-### 1.2 Annotation Extraction
-Use `Ctrl+Alt+i` to get the original text of the reference to annotation block.
-#### Get Excerpts of PDF Text Highlights
-Sometimes it's preferred to keep both the ref and the highlighted text. This plugin provides a shortcut to extract the excerpt of the text highlights while keeping the original references.  
+### 2. Annotation Extraction 📝
+For any highlight, this feature replaces `((uuid))` with its linked content (wrapped by a customizable template). For area highlights, $\LaTeX$ OCR are performed first and taken as the contents(Experimental). It supports batch extraction.
 
-A template is provided to customize the style of the inserted text. See [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) for more details.
+- The default shortcut is `Ctrl+Alt+i`, which converts all `((uuid))` links in block at cursor or selected blocks.
 
-<!-- TODO explain the pdf-ref property -->
+- Templates for inserting text and TeX:
+  - [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) 
+  - [Template for TeX OCR](#area_style-template-for-inserting-tex) 
+- Use case:
+  - When editing in an external application, the references to highlights are just `((uuid))`. 
+  - A reference `((uuid))` might be broken unnoticeably. Most of the time, it's recoverable by searching the UUID in the graph folder. But sometimes, the content could be lost forever. So it's safer to keep both the content as well as the link to it.
+  - Automatically store the OCR results for later use. 
+  - Incremental reading of PDFs. Logseq supports drag and drop text from PDFs. But this way the link to the original highlight is lost.  
 
-#### TeX OCR of Area Highlights
-Inspired by [logseq-formula-ocr-plugin](https://github.com/olmobaldoni/logseq-formula-ocr-plugin), this plugin helps to extract TeX from area highlights.
+      
+#### Text Highlights from PDF 
+Here we explain what happens when you use `Ctrl+Alt+i` to convert `((uuid))` links in a block.
 
-> ❗ **For new users: API token** The OCR service from Hugging Face is used.
-> 1. Get a [Hugging Face API token](https://huggingface.co/settings/tokens)
-> 2. In the plugin settings, paste your API key to the `HuggingFace User Access Token` field.
-> 
-> Notice that the free quota of the OCR service is not quite clear to me (please tell me if you know the number). For more info, see [Hugging Face - Documentation - huggingface.co/](https://huggingface.co/docs).
+In the default case, 
+``` 
+- ((uuid))
+```
+will be converted to
+```
+- pdf-ref:: ((uuid))
+  > The original content of ((uuid)) 
+```
+- `pdf-ref` is always displayed in just one line. This is to avoid showing the same text again.
+- The name of the property `pdf-ref` is customizable in settings.
+- The template for inserting text is customizable in settings: [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts).
 
-> Notice the plugin modifies `hl__xxx` pages. A block property `ocr::`  will be added to the area highlight block, as shown below. This is to avoid repeated OCR of the same area highlight. If you want to re-OCR an area highlight, just delete the `ocr::` property.
-> <br>
-> <img src="originalAreaHL.png" width="200" >
+#### Area Highlights from PDF 
+This plugin also helps to extract TeX formula from area highlights. The OCR service is provided by [Hugging Face](https://huggingface.co/). The OCR model is [Norm/nougat-latex-base](https://huggingface.co/Norm/nougat-latex-base). 
 
+Two ways to invoke OCR: 
+- Button: `copy as TeX` on the area highlight picture. The TeX formula will be copied to clipboard.
 
-Two ways are provided to extract TeX from area highlights: button and shortcut.
-##### Button: Copy TeX to clipboard
-On the area highlights, a button named `copy as TeX` is provided to copy TeX to clipboard.  
-<img src="areaHL.png" width="200" >
+  <img src="areaHL.png" width="200" >
 
+- Shortcut: `Ctrl+Alt+i`. The same key also works for text highlight extraction. But here a TeX string will be inserted into the block. 
+  - A template is provided to customize the style of the inserted TeX: [Template for TeX OCR](#area_style-template-for-inserting-tex).
 
-##### Shortcut: Insert TeX into the Block
-Use `Ctrl+Alt+i` to insert TeX string into the block. A template is provided to customize the style of the inserted TeX. See [Template for TeX OCR](#area_style-template-for-inserting-tex) for more details.
+<details>
+  <summary> A block property <code>ocr::</code>  will be added to the area highlight block</summary>
 
-### 1.3 PDF Open Button (Experimental)
+- In <code>hl__xxx</code> pages, you might see something like this after OCR: 
+<br>
+<img src="originalAreaHL.png" width="200" >
+
+- This is to avoid processing the same picture again. To force a reprocess, please delete the <code>ocr::</code> property and then invoke the OCR function.
+</details>
+
+<details>
+  <summary><h3>3. Open PDF from Any Path (under development 🚧)</h3></summary>
+
 With [Zotero integration](https://docs.logseq.com/#/page/zotero) enabled, we could open PDFs under `Zotero linked attachment base directory` even if it's not in the assets folder. Logesq provides a macro `{{zotero-linked-file your_pdf_path}}` which is rendered as a button.
 <br>
 <img src="pdfOpenButton.png" width="250" >
@@ -87,10 +139,13 @@ Here is how we could take advantage of it:
 
 > **Caution!** Buttons are delicate. If Logseq cannot find a PDF specified by the button, it may crash (possible data loss). Dynamical update might be implemented in the future. But no easy solutions so far. One idea is to record Zotero item key to update the button from Zotero. PRs or ideas are welcome.
 
-> **How it works and when to use it.**
-Personally, I love this hack because in principle by creating mutli-profiles, we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. However, this feature depends on the enhancements to the multi-profile feature, as proposed in [this PR](https://github.com/logseq/logseq/pull/10430). Without it, it's better to ignore this function till now.
+<details>
+  <summary>How it works and when I use it.</summary>
+> Personally, I love this hack because by creating mutli-profiles, in principle we could open any PDFs no matter where it's located on your PC. For example, we could insert buttons as "bookmarks" linked to any PDF without importing them. However, this feature depends on the enhancements to the multi-profile feature, as proposed in [this PR](https://github.com/logseq/logseq/pull/10430). Without it, it's better to ignore this function. 
 >
 > Maybe with more Logseq API published in future, we could create various buttons, such as a button that links to a specific page of a PDF, or even "non-highlight" button that eliminates the need for highlighting. And if you have any ideas, PRs are welcome.
+</details>
+</details>
 
 ## ⚙ 2. Settings
 #### `insert_button`: insert PDF open button when importing Zotero items
