@@ -6,6 +6,7 @@ export default {
         vue()
     ],
     optimizeDeps: {
+        include: ['vue-virtual-scroller'],
         plugins: [
             vue()
         ]
