@@ -5,7 +5,7 @@ Search for "PDF Extract" in the Logseq plugin store and install it. Or you could
 
 If you are using this plugin for the first time, follow these steps after installation:
 <details>
-  <summary>❗ Enabling TeX OCR</summary>
+  <summary>❗ To enable TeX OCR of area highlights</summary>
 
 - To use the OCR service from Hugging Face,
 
@@ -24,70 +24,73 @@ If you are using this plugin for the first time, follow these steps after instal
   - Zotero must be open while using this feature.
 </details>
 
-If the `/Zotero` command is already working as expected, then you're good to go! 🎉 
+And if `/Zotero` command is already working on your device, then you're good to go! 🎉 
 
-**If the `/Zotero` command not working**:
 <details>
-  <summary> Please follow this to ensure PDFs <code>open</code> buttons work well! (Recommended)</summary>
+  <summary> If the `/Zotero` command does not work yet, then PDFs <code>open</code> buttons might not either. Here is what you should do: </summary>
   
-> - Go to Logseq and find the Zotero integration settings. 
->   - See [Zotero Integration](https://docs.logseq.com/#/page/zotero) for more guidance.
->   - Your Zotero profiles, like `Zotero API key` and so on, are not accessible by plugins, which means they are not required for this plugin. Consequently, this plugin will never be affected by any modification in profiles.
-> - To ensure the PDF `open` buttons work well and prevent Logseq from crashing, you must set up your Zotero profile with the paths outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9):
->   - `Zotero data directory` for imported PDF attachment 
->   - or `Linked Attachment Base Directory` for linked PDF attachment. 
+> - Go to Logseq and find the [Zotero Integration](https://docs.logseq.com/#/page/zotero).
+> -  set up your Zotero profile with the paths outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9):
+>    - `Zotero data directory` for imported PDF attachment 
+>    - or `Linked Attachment Base Directory` for linked PDF attachment. 
+
+After above steps we make ensure the PDF `open` buttons work well. If not, Logseq might crash when you click those buttons.
+
+One more thing is your Zotero profile has no direct effect on this plugin.
+- Your Zotero profiles, like `Zotero API key` and other options, are not exposed to plugins by Logseq, which means modifications in your Zotero profile will never change any behavior of this plugin.
 </details>
 
 ## 🚀 A Quick Guide
 
 ###  1. Import Zotero Items  📚
 
-This function serves as a local equivalent to Logseq's . For a comparison between this and Logseq's native `/Zotero` command, see [#6](https://github.com/e-zz/logseq-pdf-extract/discussions/6).
+For a comparison between this and Logseq's native `/Zotero` command, see [#6](https://github.com/e-zz/logseq-pdf-extract/discussions/6).
 
-Currently, this plugin supports quick importing of items selected in Zotero or in a Zotero search panel. More features are planned (see [here](#possible-improvements) PRs are welcome). Also, Better BibTeX citation key can be imported. (Experimental. See [#alias_citationKey](#alias_citationkey-experimental) ).
+Currently, this plugin supports quick importing of **items selected in Zotero** or importing by **searching items in a popup panel**, as shown below. [More features are planned](#possible-improvements) and PRs welcome. If Better BibTeX enabled in Zotero, citation keys can also be imported. (See [alias citationKey](#alias_citationkey-experimental) for more details. This is an experimental feature.).
 
-- Import items selected in Zotero: 
-  - Press `Ctrl+Alt+e` or type `/PDF: import selected Zotero items at cursor` 
-  - Selected Zotero Items => Logseq pages
-  - Use case: 
-    - import items that have just been added to Zotero from browser via the Zotero Connector
-    - import multiple items simultaneously
-  - Option: turn off automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
+**Import items selected in Zotero** 
 
 ![demonstration](importSelected.gif)
+- Press `Ctrl+Alt+e` or type `/PDF: import selected Zotero items at cursor` 
+- Selected Zotero Items => Logseq pages
+- Use case: 
+  - import items that have just been added to Zotero from browser via the Zotero Connector
+  - import multiple items simultaneously
+- Option: turn off automatic insertion of PDF open buttons while importing. See [Settings](#settings) for more details.
 
-- Show search panel: 
-  - Press `Ctrl+Alt+z` or type `/PDF: show search panel`
+---
+**Search panel**: 
+
+![search](searchPanel.gif)
+- Press `Ctrl+Alt+z` or type `/PDF: show search panel`
   - Search items by titles (press `Enter` to execute a search).
   - Use mouse or arrow keys to scroll the results.
   - Press `Enter` or click to insert an item at cursor.
-      - `ctrl+click` to insert multiple items
-  - The items inserted will also be imported into Logseq if no duplicate page found (just like `/Zotero`).
-  - And on showing up, by default it will list items selected in Zotero.  (But this does not work at the first run after Logseq is opened or refreshed. See [Known Issues](#known-issues))
+  - `ctrl+click` to insert multiple items
+- The items inserted will also be imported into Logseq if no duplicate page found (just like `/Zotero`).
 
-![search](searchPanel.gif)
+And by default on showing up, the panel will be initiated with items selected in Zotero.  (Not stable. See [Known Issues](#known-issues))
+> ❗ Warn: Search panel hasn't been thoroughly tested. It's better to enable git version control or backup.
 
-> ❗ Search panel hasn't been thoroughly tested. Please use `ctrl+z` to undo if something goes wrong.
 
-> About importing notes: 
-> Not currently planned. But PRs are welcome.
 
 ### 2. Annotation Extraction 📝
 For any highlight, this feature replaces `((uuid))` with its linked content (wrapped by a customizable template). For area highlights, $\LaTeX$ OCR are performed first and taken as the contents(Experimental). It supports batch extraction.
 
-- The default shortcut is `Ctrl+Alt+i`, which converts all `((uuid))` links in block at cursor or selected blocks.
+![Highlights extraction](highlights.gif)
 
-- Templates for inserting text and TeX:
-  - [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) 
-  - [Template for TeX OCR](#area_style-template-for-inserting-tex) 
+- The default shortcut is `Ctrl+Alt+i`, which converts all `((uuid))` links in block at cursor or selected blocks.
 - Use case:
   - When editing in an external application, the references to highlights are just `((uuid))`. 
   - A reference `((uuid))` might be broken unnoticeably. Most of the time, it's recoverable by searching the UUID in the graph folder. But sometimes, the content could be lost forever. So it's safer to keep both the content as well as the link to it.
   - Automatically store the OCR results for later use. 
   - Incremental reading of PDFs. Logseq supports drag and drop text from PDFs. But this way the link to the original highlight is lost.  
+- Templates for inserting text and TeX:
+  - [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts) 
+  - [Template for TeX OCR](#area_style-template-for-inserting-tex) 
 
-      
-#### Text Highlights from PDF 
+<blockquote>
+<details> <summary><bold>Text Highlights from PDF</bold></summary>
 Here we explain what happens when you use `Ctrl+Alt+i` to convert `((uuid))` links in a block.
 
 In the default case, 
@@ -102,9 +105,12 @@ will be converted to
 - `pdf-ref` is always displayed in just one line. This is to avoid showing the same text again.
 - The name of the property `pdf-ref` is customizable in settings.
 - The template for inserting text is customizable in settings: [Template for Annotation Excerpts](#excerpt_style-template-for-annotation-excerpts).
+</details>
 
-#### Area Highlights from PDF 
-This plugin also helps to extract TeX formula from area highlights. The OCR service is provided by [Hugging Face](https://huggingface.co/). The OCR model is [Norm/nougat-latex-base](https://huggingface.co/Norm/nougat-latex-base). 
+<details>
+<summary><bold>Area Highlights from PDF</bold></summary>
+
+It's possible to extract TeX formula from area highlights. The OCR service is provided by [Hugging Face](https://huggingface.co/). The OCR model is [Norm/nougat-latex-base](https://huggingface.co/Norm/nougat-latex-base). 
 
 Two ways to invoke OCR: 
 - Button: `copy as TeX` on the area highlight picture. The TeX formula will be copied to clipboard.
@@ -113,8 +119,8 @@ Two ways to invoke OCR:
 
 - Shortcut: `Ctrl+Alt+i`. The same key also works for text highlight extraction. But here a TeX string will be inserted into the block. 
   - A template is provided to customize the style of the inserted TeX: [Template for TeX OCR](#area_style-template-for-inserting-tex).
-
-<details>
+<blockquote>
+ <details>
   <summary> A block property <code>ocr::</code>  will be added to the area highlight block</summary>
 
 - In <code>hl__xxx</code> pages, you might see something like this after OCR: 
@@ -123,7 +129,10 @@ Two ways to invoke OCR:
 
 - This is to avoid processing the same picture again. To force a reprocess, please delete the <code>ocr::</code> property and then invoke the OCR function.
 </details>
-
+</blockquote>
+</details>
+</blockquote>
+<br>
 <details>
   <summary><h3>3. Open PDF from Any Path (under development 🚧)</h3></summary>
 
@@ -147,30 +156,30 @@ Here is how we could take advantage of it:
 </details>
 </details>
 
-## ⚙ 2. Settings
+## ⚙ Settings
 #### `insert_button`: insert PDF open button when importing Zotero items
-If enabled, when importing Zotero items, the plugin will insert a PDF open button if the item has a PDF attachment. Notice that it will insert multiple buttons if more than one PDF attachment is found.
-
-If you don't want this behavior, tick it off. 
+Turn this on and you'll get a button to open a PDF every time you import an item from Zotero that has a PDF attached. If an item has more than one PDF, you'll get more than one button. 
 
 #### `alias_citationKey` (Experimental)
-It's quite common to use [Better BibTeX](https://github.com/retorquere/zotero-better-bibtex/) to manage BibTeX keys in Zotero. 
+Lots of people use [Better BibTeX](https://github.com/retorquere/zotero-better-bibtex/) to handle BibTeX keys in Zotero. 
 
-If this option is on, the citation key will be used as the `alias` property of an item page.  (Inspired by [sawhney17/logseq-citation-manager](https://github.com/sawhney17/logseq-citation-manager))
-> For example, if the citation key is `Smith2021`, then the item page will have property `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
+If you turn this on, the citation key will be used as the `alias` for an item page. This idea came from [sawhney17/logseq-citation-manager](https://github.com/sawhney17/logseq-citation-manager).
+> For example, if the citation key is `Smith2021`, then the item page will have `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
+
 
 #### `excerpt_style`: Template for Annotation Excerpts
-This template defines the style of the inserted text. In the template, `{{excerpt}}` is provided as a placeholder, which will be replaced by the excerpt. The default template is
+This is where you decide how the inserted text should look. Use `{{excerpt}}` as a placeholder, which will be replaced by the excerpt. By default, it looks like this:
 ``` 
 > {{excerpt}}
 ```
 
 #### `area_style`: Template for Inserting TeX 
-When inserting TeX, one could customize the style by a template. In the template, two placeholders are provided: `uuid` and `tex`, which will be replaced by the UUID of the area highlight and the TeX respectively. The default template is
+When inserting TeX, one could also customize the style by a template. In the template, two placeholders are provided: `uuid` and `tex`, which will be replaced by the UUID of the area highlight and the TeX respectively. The default template is
 ```
 ((uuid))\n$$tex$$
 ```
-> For example, if you need to replace the original area highlights with TeX, then use `$$tex$$` as the template. More complex template with hiccup syntax should be possible, but I haven't tested it.
+> For example,  use `$$tex$$` as the template and  the original area highlights will be replaced by LaTeX OCR results.
+> More complex template using hiccup syntax might be possible, but I haven't tested it.
 
 # Possible Improvements
 
@@ -196,7 +205,8 @@ Proof of concept:
 - [ ] ❓ support Zotero search syntax
 - [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
 
---- Not planned yet
+---
+Not planned yet
 - [ ] Notes and two-way sync
 - [ ] Item page customization: e.g., Org-mode support
 
