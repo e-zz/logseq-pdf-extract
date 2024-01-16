@@ -1,13 +1,13 @@
 import { readOcr, updateOcr } from "./ocrLib"
 import { wrapAreaIdTex } from "./texLib";
 
-const __debug = logseq.settings.debug_hl;
+// FIXME : load settings after the plugin is fully initialized
 async function getContent(ref_id) {
   let ref_block = (await logseq.Editor.getBlock(ref_id)).content;
   // console.log("in getContent", content);
 
 
-  if (__debug) {
+  if (debug_hl) {
     console.log("in getContent 1", ref_block, ref_block[0]);
     console.log("in getContent 2", ref_block[0][0].split('\n'));
   }
@@ -16,7 +16,7 @@ async function getContent(ref_id) {
   // following lines assume prop:: only appears at the end of the block 
   let ref_block_cleaned = ref_block.split('\n');
 
-  if (__debug) {
+  if (debug_hl) {
     console.log("in getContent 3", ref_block_cleaned);
     console.log(ref_block_cleaned[0]);
   }
@@ -40,7 +40,7 @@ async function extractRef(uuid) {
 
   // cases handling
   if (ref_content == "") {
-    if (__debug) {
+    if (debug_hl) {
       console.log(`No valid content for ${uuid}`);
     }
     return ref
@@ -55,7 +55,7 @@ async function extractRef(uuid) {
   const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
   const ls_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
 
-  if (__debug) {
+  if (debug_hl) {
     console.log("extract uuid", uuid);
     console.log("\t hl_type ", hl_type);
     console.log("\t ls_type ", ls_type);
@@ -84,7 +84,7 @@ async function extractBlock(block) {
   // 2. DONE ref surrounded by text 
 
   const block_content = block.content;
-  if (__debug) {
+  if (debug_hl) {
     console.log("in openCurrentLine block\t", block);
     console.log("in openCurrentLine block_content\t", block_content);
   }
@@ -101,7 +101,7 @@ async function extractBlock(block) {
     newContent = newContent.replace(matches[i][0], replacements[i]);
   }
 
-  if (__debug) { console.log("in ref ", newContent.trim()) }
+  if (debug_hl) { console.log("in ref ", newContent.trim()) }
 
   await logseq.Editor.updateBlock(block.uuid, newContent.trim());
 }

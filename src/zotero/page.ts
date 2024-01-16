@@ -1,4 +1,3 @@
-const __debug = logseq.settings.debug_zotero;
 
 import { Attachment } from "./attachment";
 
@@ -47,7 +46,7 @@ export class Page implements ZoteroPage {
 
     // TODO note 
     // let notes = {}; 
-    if (__debug) console.log("in fromRaw", rawData);
+    if (debug_zotero) console.log("in fromRaw", rawData);
 
     for (const [key, value] of Object.entries(rawData)) {
       switch (key) {
@@ -170,7 +169,7 @@ export class Page implements ZoteroPage {
 
   async safeImport() {
     // check if the item is already imported. If not, import it.
-    if (__debug) console.log("in safeImport", this.props, this.attachments, await this.imported());
+    if (debug_zotero) console.log("in safeImport", this.props, this.attachments, await this.imported());
 
     if (!await this.imported()) {
 

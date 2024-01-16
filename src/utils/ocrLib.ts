@@ -1,5 +1,3 @@
-const __debug = logseq.settings.debug_hl;
-
 export async function readOcr(uuid) {
   // let content = await logseq.Editor.getBlock(uuid);
   let prop = await logseq.Editor.getBlockProperty(uuid, "ocr")
@@ -51,7 +49,7 @@ async function getTexFromHuggingFace(blob) {
   }
 
   // If there is no error, return the result
-  if (__debug) {
+  if (debug_hl) {
     console.log('result: ', result);
     console.log('result[0].generated_text: ', result[0].generated_text);
   }

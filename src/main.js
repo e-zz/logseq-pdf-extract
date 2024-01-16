@@ -6,6 +6,7 @@ import App from './App.vue'
 import { DynamicScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import './index.css'
+import { debug_welcome } from './utils/debug'
 
 /**
  * user model
@@ -71,6 +72,9 @@ function main() {
   injectAreaHL();
 
   registerCommands();
+
+  debug_welcome();
+
 }
 
 // bootstrap
@@ -172,6 +176,20 @@ logseq
       type: "heading",
       default: null,
     },
+    // TODO: use enum type
+    //  {
+    //     key: "debug",
+    //     type: "enum",
+    //     default: [],
+    //     title: "",
+    //     enumChoices: [
+    //         "A",
+    //         "B",
+    //         ...
+    //     ],
+    //     enumPicker: "checkbox",
+    //     description: "",
+    // },
     {
       key: 'debug_zotero',
       type: 'boolean',
@@ -186,11 +204,4 @@ logseq
       title: 'Highlight',
       description: '',
     },
-    // {
-    //   key: 'debug_mode_Zotero',
-    //   type: 'boolean',
-    //   default: false,
-    //   title: 'Zotero',
-    //   description: '',
-    // }
   ]).ready(createModel()).then(main)

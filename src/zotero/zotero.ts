@@ -3,7 +3,6 @@
 import { Zapi } from "./zapi"
 import { ZoteroItems } from "./item";
 
-const __debug = logseq.settings.debug_zotero;
 
 
 export class Zotero {
@@ -11,7 +10,7 @@ export class Zotero {
 
   static async search(keyword: string) {
     let res = await Zapi.getByEverything(keyword)
-    if (__debug) console.log(res);
+    if (debug_zotero) console.log("in Zotero.search:\t", res);
     return res
   }
 
@@ -20,7 +19,7 @@ export class Zotero {
     if (res) {
       res = ZoteroItems.fromRaw(res);
 
-      if (__debug) console.log(res);
+      if (debug_zotero) console.log("in Zotero.getByKeys:\t", res);
 
       return res
     }
@@ -30,9 +29,8 @@ export class Zotero {
     let res = await Zapi.getBySelection();
 
     res = res.map((i) => i.item)
-    if (__debug) {
-      console.log("in getSelectedRaw", res);
-    }
+
+    if (debug_zotero) console.log("in Zotero.getSelectedRaw:\t", res);
 
     return res
   }
@@ -40,9 +38,7 @@ export class Zotero {
     // get items selected in Zotero (not Note) with their attachments
     let res = ZoteroItems.fromRaw(await Zapi.getBySelection());
 
-    if (__debug) {
-      console.log("in getSelected", res);
-    }
+    if (debug_zotero) console.log("in Zotero.getSelected\t", res);
 
     return res
   }
@@ -59,9 +55,8 @@ export class Zotero {
 
     queryRes = ZoteroItems.fromRaw(queryRes);
 
-    if (__debug) {
-      console.log("in getRecent", queryRes);
-    }
+    if (debug_zotero) console.log("in Zotero.getRecent", queryRes);
+
     // TODO rank by time modified
     return queryRes;
   }
@@ -70,12 +65,13 @@ export class Zotero {
     // import items to cursor
     // if items is empty, import se
     await Promise.all(items.map(item => item.page.safeImport()));
+    if (debug_zotero) console.log("in Zotero.safeImportToCursor\titems:", items);
 
     if (await logseq.Editor.checkEditing()) {
 
       let qAlias = logseq.settings?.alias_citationKey;
 
-      if (__debug) console.log("q_alias", qAlias);
+      if (debug_zotero) console.log("q_alias", qAlias);
 
       for (let i = 0; i < items.items.length; i++) {
 
@@ -103,6 +99,6 @@ export class Zotero {
 
 export async function importSelectedToCursor() {
   let selected = await Zotero.getSelected();
-  if (__debug) console.log("in importSelectedToCursor \t selected", selected);
+  if (debug_zotero) console.log("in importSelectedToCursor \t selected", selected);
   await Zotero.safeImportToCursor(selected);
 }
