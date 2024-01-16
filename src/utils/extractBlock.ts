@@ -1,7 +1,7 @@
 import { readOcr, updateOcr } from "./ocrLib"
 import { wrapAreaIdTex } from "./texLib";
 
-const __debug = false;
+const __debug = logseq.settings.debug_hl;
 async function getContent(ref_id) {
   let ref_block = (await logseq.Editor.getBlock(ref_id)).content;
   // console.log("in getContent", content);

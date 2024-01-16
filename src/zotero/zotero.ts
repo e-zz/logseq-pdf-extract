@@ -3,7 +3,7 @@
 import { Zapi } from "./zapi"
 import { ZoteroItems } from "./item";
 
-let __debug = false;
+const __debug = logseq.settings.debug_zotero;
 
 
 export class Zotero {

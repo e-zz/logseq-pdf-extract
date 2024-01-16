@@ -1,4 +1,4 @@
-const __debug = true;
+const __debug = logseq.settings.debug_zotero;
 
 import { Attachment } from "./attachment";
 

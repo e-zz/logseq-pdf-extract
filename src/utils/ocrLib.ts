@@ -1,4 +1,5 @@
-let __debug = false;
+const __debug = logseq.settings.debug_hl;
+
 export async function readOcr(uuid) {
   // let content = await logseq.Editor.getBlock(uuid);
   let prop = await logseq.Editor.getBlockProperty(uuid, "ocr")

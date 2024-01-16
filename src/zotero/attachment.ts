@@ -1,4 +1,4 @@
-const __debug = true;
+const __debug = logseq.settings.debug_zotero;
 
 const buttonLinkedFile = (path: string) =>
   `{{zotero-linked-file "${path.replace("attachments:", "")}"}}`

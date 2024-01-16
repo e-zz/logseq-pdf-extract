@@ -165,4 +165,32 @@ logseq
       description:
         "Fill in the root folders of your PDF files, separated by comma. For example: /home/user/Documents, C:/Users/Downloads",
     },
+    {
+      key: 'group dev',
+      title: "🤖 Dev",
+      description: "More verbose logs in console for the dev purpose.",
+      type: "heading",
+      default: null,
+    },
+    {
+      key: 'debug_zotero',
+      type: 'boolean',
+      default: false,
+      title: 'Zotero',
+      description: '',
+    },
+    {
+      key: 'debug_hl',
+      type: 'boolean',
+      default: false,
+      title: 'Highlight',
+      description: '',
+    },
+    // {
+    //   key: 'debug_mode_Zotero',
+    //   type: 'boolean',
+    //   default: false,
+    //   title: 'Zotero',
+    //   description: '',
+    // }
   ]).ready(createModel()).then(main)
