@@ -248,5 +248,3 @@ Both projects are not only feature-rich but also continue to evolve through acti
 - Install dependencies with `npm install`
 - Build the application using `npm run build` or `npm run watch`
 - Load the plugin in the Logseq Desktop client using the `Load unpacked plugin` option.
-
-> ❗ **Notice:** Unfortunately, the dependency `vue-virtual-scroller` does not work well with `vite run --watch` or `npm run watch` in the `package.json`. Use `npm run build` instead. Please help if you know how to fix it.
