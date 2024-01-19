@@ -27,7 +27,10 @@ export class Attachment {
       console.log("raw:", raw);
     }
 
+    file.baseName = raw.filename;
+    file.relPath = raw.filename;
     file.key = raw.key
+    file.localLink = `zotero://select/library/items/${raw.key}`;
     file.linkMode = raw.linkMode;
     file.contentType = raw.contentType;
     file.localLink = `zotero://select/library/items/${raw.key}`;
@@ -39,8 +42,6 @@ export class Attachment {
 
     switch (file.linkMode) {
       case "imported_file":
-        file.baseName = raw.filename;
-        file.relPath = raw.filename;
         file.button = buttonImportedFile(file.key, file.relPath);
         if (debug_zotero) console.log("imported_file\tbutton:", file.button);
         break;
@@ -49,6 +50,12 @@ export class Attachment {
         file.relPath = raw.path.replace("attachments:", "");
         file.button = buttonLinkedFile(file.relPath);
         if (debug_zotero) console.log("linked_file\tbutton:", file.button);
+        break;
+      case "imported_url":
+        // TODO for PDF with linkMode "imported_url", should we use file.localLink="zotero://select/library/items/${raw.key}"?
+        file.localLink = raw.url;
+        file.button = buttonImportedFile(file.key, file.relPath);
+        if (debug_zotero) console.log("imported_url\tbutton:", file.button);
         break;
       default:
         console.log(`Unhandled linkMode ${file.linkMode} for ${file.localLink}`);
