@@ -42,11 +42,15 @@ export class Page implements ZoteroPage {
     let attachments;
     let abstract;
 
+    let debug_zotero: boolean = logseq.settings?.debug_zotero
+
     const qAlias: boolean = logseq.settings?.alias_citationKey
 
     // TODO note 
     // let notes = {}; 
     if (debug_zotero) console.log("in fromRaw", rawData);
+
+    let aliasValue = "";
 
     for (const [key, value] of Object.entries(rawData)) {
       switch (key) {
@@ -73,7 +77,7 @@ export class Page implements ZoteroPage {
           break;
         case 'citationKey':
           if (qAlias) {
-            props['alias'] = wrapTag(value);
+            aliasValue = value;
           }
           break;
         default:
@@ -90,7 +94,12 @@ export class Page implements ZoteroPage {
 
     let page = new Page();
     page.title = props['title'];
+
+    if (qAlias) {
+      props = { alias: aliasValue, ...props };
+    }
     page.props = props;
+
     if (attachments) {
       page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
     }
@@ -109,7 +118,7 @@ export class Page implements ZoteroPage {
   }
 
   insertAliasRef() {
-    logseq.Editor.insertAtEditingCursor(this.props['alias']);
+    logseq.Editor.insertAtEditingCursor(wrapTag(this.props['alias']));
   }
 
   safeInsertAliasRef() {
@@ -168,6 +177,8 @@ export class Page implements ZoteroPage {
   }
 
   async safeImport() {
+    let debug_zotero: boolean = logseq.settings?.debug_zotero
+
     // check if the item is already imported. If not, import it.
     if (debug_zotero) console.log("in safeImport", this.props, this.attachments, await this.imported());
 
