@@ -7,7 +7,11 @@ function parse_unwantedKeys() {
   if (unwantedKeys == undefined) {
     return [];
   } else {
-    return unwantedKeys.split(/[\n,\s]+/);
+    unwantedKeys = unwantedKeys.split(/[\n,\s]+/);
+    if (logseq.settings?.alias_citationKey && unwantedKeys.includes('alias')) {
+      unwantedKeys.splice(unwantedKeys.indexOf('alias'), 1);
+    }
+    return unwantedKeys;
   }
 }
 // TODO any way to dynamically update the unwantedKeys on settings changed ? It's possible in react
