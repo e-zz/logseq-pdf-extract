@@ -59,7 +59,7 @@ export class Page implements ZoteroPage {
           break;
         case 'creators':
           // TODO check creatorType (usually 'author', but can be other values )
-          props['authors'] = value.map(creator => wrapTag(creator.firstName + creator.lastName)).join(', ');
+          props['authors'] = value.map(creator => wrapTag(creator.firstName + ' ' + creator.lastName)).join(', ');
           break;
         case 'tags':
           if (value.length == 0) break;
