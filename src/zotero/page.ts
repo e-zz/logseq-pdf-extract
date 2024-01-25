@@ -1,6 +1,19 @@
 
 import { Attachment } from "./attachment";
 
+let unwantedKeys;
+function parse_unwantedKeys() {
+  let unwantedKeys = logseq.settings?.unwantedKeys;
+  if (unwantedKeys == undefined) {
+    return [];
+  } else {
+    return unwantedKeys.split(/[\n,\s]+/);
+  }
+}
+// TODO any way to dynamically update the unwantedKeys on settings changed ? It's possible in react
+
+logseq.onSettingsChanged(() => { unwantedKeys = parse_unwantedKeys() });
+
 interface ZoteroPage {
   title: string;
   props: { [key: string]: string | string[] | number };
@@ -14,9 +27,7 @@ function camelToKebab(camelCase: string): string {
 
 const wrapTag = (tag: string) => `[[${tag}]]`;
 
-
-
-const unwantedKeys = [
+const defaultUnwantedKeys = [
   'dateAdded',
   'dateModified',
   'collections',
@@ -78,7 +89,7 @@ export class Page implements ZoteroPage {
           break;
         default:
           // remove unwanted keys
-          if (unwantedKeys.includes(key)) {
+          if (defaultUnwantedKeys.includes(key)) {
             break;
           }
           props[camelToKebab(key)] = value;
@@ -90,6 +101,9 @@ export class Page implements ZoteroPage {
 
     let page = new Page();
     page.title = props['title'];
+    for (const key of unwantedKeys) {
+      delete props[key];
+    }
     page.props = props;
     if (attachments) {
       page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));

@@ -116,6 +116,14 @@ logseq
       description: 'If you use [BetterBibTeX](https://github.com/retorquere/zotero-better-bibtex), you can choose `citationKey` as page alias. Search importation is also affected: `[[citationKey]]` will be used when importing items at cursor. (Recommend: off)',
     },
     {
+      key: 'unwantedKeys',
+      type: 'string',
+      inputAs: "textarea",
+      default: '',
+      title: 'List of unwanted keys',
+      description: 'Put the keys you want to ignore when importing Zotero items, separated by comma or line break. For example: `key1, key2`',
+    },
+    {
       key: 'group extract',
       title: "🧷 Convert PDF ref into text",
       description: "",
