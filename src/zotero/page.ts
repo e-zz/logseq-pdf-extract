@@ -3,7 +3,7 @@ import { Attachment } from "./attachment";
 
 let unwantedKeys;
 function parse_unwantedKeys() {
-  let unwantedKeys = logseq.settings?.unwantedKeys;
+  let unwantedKeys = logseq.settings?.unwanted_keys;
   if (unwantedKeys == undefined) {
     return [];
   } else {
