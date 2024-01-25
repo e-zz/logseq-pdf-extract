@@ -14,7 +14,6 @@ function parse_unwantedKeys() {
     return unwantedKeys;
   }
 }
-// TODO any way to dynamically update the unwantedKeys on settings changed ? It's possible in react
 
 logseq.onSettingsChanged(() => { unwantedKeys = parse_unwantedKeys() });
 
@@ -31,6 +30,7 @@ function camelToKebab(camelCase: string): string {
 
 const wrapTag = (tag: string) => `[[${tag}]]`;
 
+// TODO combine this with unwantedKeys in settings (use the list below as default)
 const defaultUnwantedKeys = [
   'dateAdded',
   'dateModified',

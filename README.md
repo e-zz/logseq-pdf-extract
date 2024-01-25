@@ -166,6 +166,14 @@ Lots of people use [Better BibTeX](https://github.com/retorquere/zotero-better-b
 If you turn this on, the citation key will be used as the `alias` for an item page. This idea came from [sawhney17/logseq-citation-manager](https://github.com/sawhney17/logseq-citation-manager).
 > For example, if the citation key is `Smith2021`, then the item page will have `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
 
+#### `unwanted_keys` 
+A list of keys that you don't want to import. For example, if you don't want to import `original-title`, then add `original-title` to the list. Separate keys with commas or newlines, like this:
+
+```
+original-title, date,
+item-type
+
+```
 
 #### `excerpt_style`: Template for Annotation Excerpts
 This is where you decide how the inserted text should look. Use `{{excerpt}}` as a placeholder, which will be replaced by the excerpt. By default, it looks like this:
