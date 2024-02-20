@@ -1,5 +1,11 @@
 <h1><img src="icon.png" alt="Alt text" width="40" height="40"> Logseq PDF Extract </h1>
 
+A plugin for improving PDF workflow in Logseq. It now mainly features:
+- Importing Zotero items
+- Post-processing (text extraction or OCR) of PDF highlights made with Logseq
+
+And (more features)[#possible-improvements] are planned. PRs are welcome!
+
 ## 🛠 Installation
 Search for "PDF Extract" in the Logseq plugin store and install it. Or you could install it manually by downloading the latest release from [GitHub Releases](https://github.com/e-zz/logseq-pdf-extract/releases/latest).
 
@@ -167,7 +173,7 @@ If you turn this on, the citation key will be used as the `alias` for an item pa
 > For example, if the citation key is `Smith2021`, then the item page will have `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
 
 #### `unwanted_keys` 
-A list of keys that you don't want to import. For example, if you don't want to import `original-title`, then add `original-title` to the list. Separate keys with commas or newlines, like this:
+A list of item page property keys that you don't want to import. For example, if you don't want to import `original-title`, then add `original-title` to the list. Separate keys with commas or newlines, like this:
 
 ```
 original-title, date,
@@ -193,7 +199,7 @@ When inserting TeX, one could also customize the style by a template. In the tem
 
 Import as Logseq pages:
 - [ ] PDF items (PDF without a parent item)
-
+- [ ] Item page customization: e.g., Org-mode support, [page template](https://github.com/e-zz/logseq-pdf-extract/discussions/10) and so on.
 Import at cursor:
 - [ ] Import specific attachment as a button
 
@@ -208,7 +214,7 @@ Search Syntax:
 
 ---
 Proof of concept:
-- [ ] ❓ Full-text search across PDFs and open matched pages in Logseq
+- [ ] ❓ Full-text search across PDFs and open matched pages in Logseq (check [the discussion](https://github.com/e-zz/logseq-pdf-extract/discussions/11) and vote for the relevant [Feature Request here](https://discuss.logseq.com/t/plugin-api-open-a-pdf-by-its-path-which-might-enable-full-text-search-across-pdfs/25199)!)
 - [ ] ❓ two-way sync: tags, title, etc.
 - [ ] ❓ support Zotero search syntax
 - [ ] ❓ show recent PDF files opened in Logseq. (Not sure if it's possible.)
@@ -216,7 +222,7 @@ Proof of concept:
 ---
 Not planned yet
 - [ ] Notes and two-way sync
-- [ ] Item page customization: e.g., Org-mode support
+- [ ] Import PDF highlights made with other tools (Check the script [LogseqPDFImporter](https://github.com/thiswillbeyourgithub/LogseqPDFImporter) instead)
 
 # Known Issues
 
