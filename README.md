@@ -24,27 +24,31 @@ If you are using this plugin for the first time, follow these steps after instal
 <details>
   <summary>❗ To enable Zotero-related features </summary>
 
-- On Zotero's side, it's necessary to install the latest version of [ZotServer](https://github.com/e-zz/ZotServer/releases/latest).
-  - To learn how to install Zotero plugins, check [Zotero Documentation](https://www.zotero.org/support/plugins).
-  - If ZotServer is successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
-  - Zotero must be open while using this feature.
-</details>
+Make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero:
+  - [Download the plugin ZotServer here](https://github.com/e-zz/ZotServer/releases/latest) 
+    - [How to install a plugin in Zotero](https://www.zotero.org/support/plugins)
+  - If successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
 
-And if `/Zotero` command is already working on your device, then you're good to go! 🎉 
+Now you can import stuff by using the slash command `/PDF: show search panel` or pressing `Ctrl+Alt+z`. The shortcut only works in editing mode.
 
+Then to view PDFs imported, you might need to specify two paths in your settings:
 <details>
-  <summary> If the `/Zotero` command does not work yet, then PDFs <code>open</code> buttons might not either. Here is what you should do: </summary>
+  <summary> Two paths possibly needed for PDF "open" buttons: </summary>
   
-> - Go to Logseq and find the [Zotero Integration](https://docs.logseq.com/#/page/zotero).
-> -  set up your Zotero profile with the paths outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9):
+> - Go to Logseq's [Zotero settings](https://docs.logseq.com/#/page/zotero) in menu.
+> - Fill in below paths by your needs (as outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9)):
 >    - `Zotero data directory` for imported PDF attachment 
 >    - or `Linked Attachment Base Directory` for linked PDF attachment. 
 
-After above steps we make ensure the PDF `open` buttons work well. If not, Logseq might crash when you click those buttons.
+And that's all for it! 🎉
 
-One more thing is your Zotero profile has no direct effect on this plugin.
-- Your Zotero profiles, like `Zotero API key` and other options, are not exposed to plugins by Logseq, which means modifications in your Zotero profile will never change any behavior of this plugin.
+This is to tell Logseq where to look for those PDFs managed by Zotero. Otherwise, Logseq might crash when you click a PDF `open` button because the PDF file is out of the current graph folder. For the detailed mechanism, see my explanation in [this PR](https://github.com/logseq/logseq/pull/10430#issue-1967091728).
+
 </details>
+
+</details>
+
+
 
 ## 🚀 A Quick Guide
 
@@ -228,6 +232,29 @@ Not planned yet
 
 - [ ] The first time you use the search box, it will not show what has been selected in Zotero. A workaround is to open the search box twice.
 - [ ] Occasionally the arrow keys don't work in the search box. A workaround is to use the mouse. It should be fixed after Logseq restarts or refreshes.
+
+# Q & A
+### How is this different from Logseq's native `/Zotero` command?
+
+This plugin is designed as a fully local substitute of the `/Zotero` command.  
+
+Meanwhile, this plugin is designed to be more user-friendly and feature-rich. For example, it supports importing multiple items at once, and it allows you to search for items in a popup panel. It also supports importing citation keys and has a more customizable import process (in future).
+
+### How to customize the template for a page created by the plugin? 
+It is still under development. See [this discussion](https://github.com/e-zz/logseq-pdf-extract/discussions/10). Please share there what exactly you want for a template (because I still don't understand the needs well).
+
+Till now, we allow to filter out unwanted properties of an item page. See [unwanted_keys#Settings](#unwanted_keys).
+
+### Why is the OCR service slow sometimes?
+
+The OCR service is provided by [Hugging Face](https://huggingface.co/). And it has a initialization time when it's not used for a while. 
+
+### Why can't I change the page title format `@xxx` in the Zotero settings?  
+One thing we should keep in mind is that the settings in your Zotero profile won't affect this plugin.
+`Insert page name with prefix:`, `Notes under block of:` and other options are not exposed to plugins in Logseq. 
+
+These settings can only influence the behavior of the native `/Zotero` command.
+
 
 # Acknowledgements
 TeX OCR
