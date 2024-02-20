@@ -16,14 +16,27 @@ export async function updateOcr(uuid) {
   return tex
 }
 
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 async function getTexFromHuggingFace(blob) {
   const access_token = logseq.settings!["HuggingFace User Access Token"]
+  const image = await blobToBase64(blob);
+  const base64Image = image.split(',')[1];
   const response = await fetch(
     "https://api-inference.huggingface.co/models/Norm/nougat-latex-base",
     {
       headers: { Authorization: `Bearer ${access_token}` },
       method: "POST",
-      body: blob,
+      body: JSON.stringify({
+        inputs: base64Image,
+        parameters: { max_new_tokens: 1000 }
+      })
     }
   );
 
