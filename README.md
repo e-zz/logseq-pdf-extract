@@ -1,10 +1,10 @@
 <h1><img src="icon.png" alt="Alt text" width="40" height="40"> Logseq PDF Extract </h1>
 
 A plugin for improving PDF workflow in Logseq. It now mainly features:
-- Importing Zotero items
-- Post-processing (text extraction or OCR) of PDF highlights made with Logseq
+- [Importing Zotero items](#1-import-zotero-items--)
+- [Post-processing (text extraction or OCR)](#2-annotation-extraction-) of PDF highlights made with Logseq
 
-And (more features)[#possible-improvements] are planned. PRs are welcome!
+And [more features](#possible-improvements) are planned. PRs are welcome!
 
 ## 🛠 Installation
 Search for "PDF Extract" in the Logseq plugin store and install it. Or you could install it manually by downloading the latest release from [GitHub Releases](https://github.com/e-zz/logseq-pdf-extract/releases/latest).
