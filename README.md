@@ -26,8 +26,8 @@ If you are using this plugin for the first time, follow these steps after instal
 
 Make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero:
   - [Download the plugin ZotServer here](https://github.com/e-zz/ZotServer/releases/latest) 
-    - [How to install a plugin in Zotero](https://www.zotero.org/support/plugins)
-  - If successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`. 
+    - Follow the [Installation instruction of ZotServer](https://github.com/e-zz/ZotServer?tab=readme-ov-file#installation)
+  - If successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`
 
 Now you can import stuff by using the slash command `/PDF: show search panel` or pressing `Ctrl+Alt+z`. The shortcut only works in editing mode.
 
