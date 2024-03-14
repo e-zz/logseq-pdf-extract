@@ -32,7 +32,7 @@ Now you can import stuff by using the slash command `/PDF: show search panel` or
 
 Then to view PDFs imported, you might need to specify two paths in your settings:
 <details>
-  <summary> Two paths possibly needed for PDF "open" buttons: </summary>
+  <summary> Two things possibly required by PDF "open" buttons: </summary>
   
 > - Go to Logseq's [Zotero settings](https://docs.logseq.com/#/page/zotero) in menu.
 > - Fill in below paths by your needs (as outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9)):
