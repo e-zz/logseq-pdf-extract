@@ -1,7 +1,7 @@
 <template>
   <div class="search-box" :class="[opts.isDark ? 'dark' : 'light']">
     <div class="search-header">
-      <input id="zotero-input" v-model="searchText" placeholder="Zotero" @keydown.enter="onEnter"
+      <input id="zotero-input" v-model="searchText" placeholder="Zotero" @input="onInput"
         @keydown.up.prevent="moveSelection(-1)" @keydown.down.prevent="moveSelection(1)" />
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="search-icon" @click="search" height="18px"
         width="18px">
@@ -58,21 +58,20 @@ onMounted(async () => {
 
 })
 
-const onEnter = async () => {
-  // either import or search again
-  const newSearch = searchText.value.trim()
-  if (__debug) console.log(lastSearch, newSearch);
-  if (lastSearch == newSearch) {
-    if (items.value?.length && items.value?.length > 0) {
-      await insert(items.value[selectedItemIndex.value].key);
-      //  assume the import and insert is finished. Hide the panel
-      logseq.hideMainUI({ restoreEditingCursor: true });
+
+let timeoutId = null;
+const onInput = () => {
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => {
+    const newSearch = searchText.value.trim();
+    if (__debug) console.log(lastSearch, newSearch);
+    if (lastSearch !== newSearch) {
+      search();
+      lastSearch = newSearch;
     }
-  } else {
-    search();
-    lastSearch = newSearch;
-  }
-}
+  }, 150); // 100ms delay
+};
+
 const search = async () => {
   // console.log(searchText.value)
   selectedItemIndex.value = 0;
