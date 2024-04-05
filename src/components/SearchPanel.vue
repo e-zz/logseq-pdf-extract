@@ -86,7 +86,11 @@ const search = async () => {
 const onClickItem = (key, event) => {
   insert(key);
   if (!event.ctrlKey) {
+    // click: insert and then close the UI
     logseq.hideMainUI({ restoreEditingCursor: true });
+  } else {
+    // ctrl + click: insert, keep the UI open and move the cursor to the next line
+    logseq.Editor.insertAtEditingCursor('\n');
   }
 }
 // TODO better multiple select
