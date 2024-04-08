@@ -180,6 +180,10 @@ Here is how we could take advantage of it:
 
 ## ⚙ Settings
 
+#### `search_delay`
+
+To optimize the performance and avoid unnecessary queries by the responsive search panel, we add some delay here. It forces to wait for a specified duration after the user stops typing in the search box before initiating a new search in Zotero. This delay ensures that the system doesn't trigger a search with every keystroke, thereby reducing unnecessary load. However, if your Zotero library has a relatively small number of items, you're welcome to reduce the delay duration as much as you like.
+
 #### `insert_button`: insert PDF open button when importing Zotero items
 
 Turn this on and you'll get a button to open a PDF every time you import an item from Zotero that has a PDF attached. If an item has more than one PDF, you'll get more than one button.
