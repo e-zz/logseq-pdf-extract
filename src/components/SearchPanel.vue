@@ -35,6 +35,8 @@ const scrollerRef = ref(null);
 const searchText = ref('')
 let items = ref([])
 const selectedItemIndex = ref(0);
+// get delay from logseq.settings
+const delay = logseq.settings?.search_delay || 100;
 const opts = inject('opts')
 let lastSearch = searchText.value;
 
@@ -68,7 +70,7 @@ const onInput = () => {
       search();
       lastSearch = newSearch;
     }
-  }, 150); // 100ms delay
+  }, delay); // 100ms delay
 };
 
 const search = async () => {

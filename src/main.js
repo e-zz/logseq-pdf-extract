@@ -102,6 +102,13 @@ logseq
       default: 'mod+alt+z',
     },
     {
+      key: 'search_delay',
+      type: 'string',
+      title: 'Delay (ms) between typing and responsive search',
+      description: 'Set the delay between typing and responsive search (default `100`). Restart or refresh Logseq to take effect.',
+      default: '100',
+    },
+    {
       key: 'insert_button',
       type: 'boolean',
       default: true,
