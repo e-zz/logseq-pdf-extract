@@ -82,11 +82,23 @@ Currently, this plugin supports quick importing of **items selected in Zotero** 
     -   Use mouse or arrow keys to scroll the results.
     -   Press `Enter` or click to insert an item at cursor.
     -   `ctrl+click` to insert multiple items
--   The items inserted will also be imported into Logseq if no duplicate page found (just like `/Zotero`).
+-   The items page creation will be aborted if the page `@{original-title}.md` already exists.
 
-And by default on showing up, the panel will be initiated with items selected in Zotero. (Not stable. See [Known Issues](#known-issues))
+By default, on showing up, the panel will show you the items being selected in Zotero. The search panel is responsive. It will request Zotero only after you stop typing for a while (see the option `search_delay` in [Settings](#search_delay)). And it matches any part (or combination) of the following (according to [Zotero's documentation](https://www.zotero.org/support/searching))
 
-> ❗ Warn: Search panel hasn't been thoroughly tested. It's better to enable git version control or backup.
+-   Full text of PDF attachments
+-   All metadata, including:
+    -   titles
+    -   tags
+    -   notes
+    -   BibTeX keys
+    -   dates
+    -   authors, etc.
+
+Some examples are
+
+-   'Jhon 2022 Simulation' will very likely match the item authored by Jhon in 2022 with the title (or main text) containing 'Simulation'.
+-   'jhon2022' will very possibly match the item with the BibTeX key 'jhon2022'.
 
 ### 2. Annotation Extraction 📝
 
