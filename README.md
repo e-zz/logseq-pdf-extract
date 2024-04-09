@@ -82,9 +82,8 @@ Currently, this plugin supports quick importing of **items selected in Zotero** 
     -   Use mouse or arrow keys to scroll the results.
     -   Press `Enter` or click to insert an item at cursor.
     -   `ctrl+click` to insert multiple items
--   The items page creation will be aborted if the page `@{original-title}.md` already exists.
 
-By default, on showing up, the panel will show you the items being selected in Zotero. The search panel is responsive. It will request Zotero only after you stop typing for a while (see the option `search_delay` in [Settings](#search_delay)). And it matches any part (or combination) of the following (according to [Zotero's documentation](https://www.zotero.org/support/searching))
+The items page will be created in the above process. But it will be aborted if the page `@{original-title}.md` already exists. By default, the panel will be initialized with the items being selected in Zotero. And the search panel is responsive. It will request Zotero automatically after you stop typing for a while (customize the `search_delay` in [Settings](#search_delay)). And it matches any part (or combination) of the following (according to [Zotero's documentation](https://www.zotero.org/support/searching))
 
 -   Full text of PDF attachments
 -   All metadata, including:
@@ -97,8 +96,8 @@ By default, on showing up, the panel will show you the items being selected in Z
 
 Some examples are
 
--   'Jhon 2022 Simulation' will very likely match the item authored by Jhon in 2022 with the title (or main text) containing 'Simulation'.
--   'jhon2022' will very possibly match the item with the BibTeX key 'jhon2022'.
+-   `John 2022 Simulation` will (very likely) match the item authored by John in 2022 with the title (or main text) containing `Simulation`.
+-   `john2022` will (very likely) match the item with the BibTeX key `john2022`.
 
 ### 2. Annotation Extraction 📝
 
@@ -194,7 +193,9 @@ Here is how we could take advantage of it:
 
 #### `search_delay`
 
-To optimize the performance and avoid unnecessary queries by the responsive search panel, we add some delay here. It forces to wait for a specified duration after the user stops typing in the search box before initiating a new search in Zotero. This delay ensures that the system doesn't trigger a search with every keystroke, thereby reducing unnecessary load. However, if your Zotero library has a relatively small number of items, you're welcome to reduce the delay duration as much as you like.
+The default delay between user's input and search is 100ms.
+
+> To optimize the performance and avoid unnecessary queries by the responsive search panel, we add some delay between user's input and queries. It forces to wait for a specified duration after the user stops typing in the search box before initiating a new search in Zotero. This delay ensures that the system doesn't trigger a search with every keystroke, thereby reducing unnecessary load. However, if your Zotero library has a relatively small number of items, you're welcome to reduce the delay duration as much as you like.
 
 #### `insert_button`: insert PDF open button when importing Zotero items
 
