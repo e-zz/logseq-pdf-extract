@@ -1,6 +1,6 @@
 {
   "name": "logseq-pdf-extract",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/index.html",
   "author": "e-zz",
   "scripts": {
