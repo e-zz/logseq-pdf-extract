@@ -30,6 +30,7 @@ const __debug = false;
 import { Zotero } from '../zotero/zotero'
 import { ref, onMounted, inject } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+import Fuse from 'fuse.js';
 
 const scrollerRef = ref(null);
 const searchText = ref('')
@@ -50,6 +51,48 @@ if (__debug) console.log(opts.value.isDark);
 //   });
 // }
 
+// Create a computed property that returns a new Fuse object with the current value of items
+const fuse = (items_list) => new Fuse(items_list.value, {
+  keys: [
+    {
+      name: 'title',
+      weight: 0.7
+    },
+    {
+      name: 'creators',
+      weight: 0.7
+    },
+    {
+      name: 'tags',
+      weight: 0.7
+    },
+    {
+      name: 'itemType',
+      weight: 0.7
+    },
+    {
+      name: 'journalAbbreviation',
+      weight: 0.7
+    },
+    {
+      name: "doi",
+      weight: 0.7
+    },
+    {
+      name: 'date',
+      weight: 0.3
+    },
+    {
+      name: 'dateAdded',
+      weight: 0.1
+    },
+    {
+      name: 'dateModified',
+      weight: 0.1
+    }
+  ],
+  threshold: 1
+});
 
 const search = async () => {
   // console.log(searchText.value)
@@ -61,6 +104,9 @@ const search = async () => {
     res = await Zotero.search(searchText.value)
   }
   items.value = res.filter((item) => !item.parentItem);
+  // Use Fuse to sort items
+  const result = fuse(items).search(searchText.value);
+  items.value = result.map(({ item }) => item);
 }
 
 const author_format = (creator) => {
