@@ -54,13 +54,12 @@ export class Zapi {
             }
             return result;
         } catch (e) {
-            if (e.name === "AbortError" && this.isTimeout) {
-                if (++this.numberTimeouts < 3) {
-                    return await this.callEndpoint(endpoint, postData);
-                }
-                this.numberTimeouts = 0;
-                e = new Error(`Timeout trying to reach ${endpoint} (tried 3 times).`);
+            console.log(e.message, this.numberTimeouts);
+
+            if (e.message === 'Failed to fetch') {
+                logseq.UI.showMsg("PDF-Extract: Please run Zotero first. For more info check 👉  https://github.com/e-zz/logseq-pdf-extract#-installation", "warning", { timeout: 8000 })
             }
+
             throw e;
         } finally {
             clearTimeout(id);
