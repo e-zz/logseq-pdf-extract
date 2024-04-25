@@ -16,7 +16,7 @@
           <div :key="item.key" class="zotero-list-item" :class="{ 'is-selected': selectedItemIndex === index }"
             @click="event => onClickItem(item.key, event)">
             <div class="title">{{ item.title }}</div>
-            <div class="info">{{ item.dateModified }}</div>
+            <div class="info">{{ item.date }}<span class="authors">{{ formatAuthors(item.creators) }}</span></div>
           </div>
         </DynamicScrollerItem>
       </template>
@@ -62,6 +62,22 @@ const search = async () => {
   }
   items.value = res.filter((item) => !item.parentItem);
 }
+
+const author_format = (creator) => {
+  return `${creator.firstName} ${creator.lastName}`;
+}
+
+const formatAuthors = (creators) => {
+  if (!creators || creators.length === 0) {
+    return '';
+  }
+  if (creators.length <= 2) {
+    // [{firstName: "John", lastName: "Doe", creatorType: "author"}, ...]
+    return creators.map(author_format).join(', ');
+  }
+  // return `${[creators[0], creators[1], creators[2]].map(author_format)}, ...${author_format(creators[creators.length - 1])}`;
+  return `${creators.slice(0, 2).map(author_format)}, ..., ${author_format(creators[creators.length - 1])}`;
+};
 
 onMounted(async () => {
   search();
@@ -242,6 +258,11 @@ $hover-background: #3e3d3d;
   .info {
     font-size: 14px;
     color: #757575;
+  }
+
+  .authors {
+    margin-left: 15px;
+    white-space: nowrap;
   }
 }
 </style>
