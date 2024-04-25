@@ -50,14 +50,21 @@ if (__debug) console.log(opts.value.isDark);
 //   });
 // }
 
+
+const search = async () => {
+  // console.log(searchText.value)
+  selectedItemIndex.value = 0;
+  let res;
+  if (searchText.value === '') {
+    res = await Zotero.getSelectedRawItems();
+  } else {
+    res = await Zotero.search(searchText.value)
+  }
+  items.value = res.filter((item) => !item.parentItem);
+}
+
 onMounted(async () => {
-
-  logseq.on("ui:visible:changed", async ({ visible }) => {
-    if (visible && searchText.value === '') {
-      items.value = await Zotero.getSelectedRawItems();
-    }
-  });
-
+  search();
 })
 
 
@@ -73,17 +80,6 @@ const onInput = () => {
   }, delay); // 100ms delay
 };
 
-const search = async () => {
-  // console.log(searchText.value)
-  selectedItemIndex.value = 0;
-  let res;
-  if (searchText.value === '') {
-    res = await Zotero.getSelectedRawItems();
-  } else {
-    res = await Zotero.search(searchText.value)
-  }
-  items.value = res.filter((item) => !item.parentItem);
-}
 const onEnter = async () => {
   // either import or search again
   const newSearch = searchText.value.trim()
