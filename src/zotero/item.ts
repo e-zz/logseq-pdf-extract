@@ -15,7 +15,7 @@ export class ZoteroItem {
   // @arg raw: raw data from Zotero API (Zapi)
   static fromRaw(rawData: any): ZoteroItem {
 
-    let { item: raw, attachments, citationKey } = rawData;
+    let { item: raw, attachments, citationKey, aux } = rawData;
 
     // It might change accordingly if the return format of Zapi changes
 
@@ -35,7 +35,7 @@ export class ZoteroItem {
     let zoteroItem = new ZoteroItem();
     zoteroItem.raw = raw
     zoteroItem.key = raw.key;
-    zoteroItem.page = Page.fromRaw(raw);
+    zoteroItem.page = Page.fromRaw(raw, aux);
     return zoteroItem
   }
 
@@ -147,10 +147,7 @@ export class ZoteroItems {
 
   static fromRaw(rawData: any[]) {
     // check if rawData is an array or similiar
-
-    let zoteroItems = new ZoteroItems();
-    zoteroItems.items = rawData.map((item: any) => ZoteroItem.fromRaw(item));
-    return zoteroItems;
+    return new ZoteroItems(rawData.map((item: any) => ZoteroItem.fromRaw(item)));
   }
 
   add(item: ZoteroItem) {

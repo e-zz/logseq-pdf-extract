@@ -119,8 +119,12 @@ logseq
       key: 'alias_citationKey',
       type: 'boolean',
       default: false,
-      title: 'Option (Experimental): use BetterBibTeX citationKey as page alias',
-      description: 'If you use [BetterBibTeX](https://github.com/retorquere/zotero-better-bibtex), you can choose `citationKey` as page alias. Search importation is also affected: `[[citationKey]]` will be used when importing items at cursor. (Recommend: off)',
+    {
+      key: 'title_zotero_basename',
+      type: 'boolean',
+      default: false,
+      title: 'Option (Experimental): enable the Zotero-style title',
+      description: 'Use the Zotero File Renaming rule (see the template in [Zotero tutorial](https://www.zotero.org/support/file_renaming)) to name the page `@___`. (Recommend: off)',
     },
     {
       key: 'unwanted_keys',

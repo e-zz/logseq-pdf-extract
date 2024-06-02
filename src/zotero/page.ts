@@ -50,14 +50,28 @@ export class Page implements ZoteroPage {
   attachments?: Attachment[];
   abstract?: string;
 
-  constructor() { }
+  constructor(props, attachments, abstract) {
+    const filteredProps = Object.keys(props)
+      .filter(key => !unwantedKeys.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = props[key];
+        return obj;
+      }, {});
 
-  static fromRaw(rawData: any): Page {
+    this.props = filteredProps;
+    this.title = props['title'];
+    this.attachments = attachments ? attachments.map(Attachment.fromRaw) : undefined;
+    this.abstract = abstract || undefined;
+  }
+
+  static fromRaw(rawData: any, aux: any): Page {
     let props = {};
     let attachments;
     let abstract;
+    let baseName = aux?.baseName;
 
-    const qAlias: boolean = logseq.settings?.alias_citationKey
+    const qAlias: boolean = logseq.settings?.alias_citationKey;
+    const qZoteroTitle: boolean = logseq.settings?.title_zotero_basename;
 
     // TODO note 
     // let notes = {}; 
@@ -68,6 +82,7 @@ export class Page implements ZoteroPage {
         case 'title':
           props['original-title'] = value;
           props['title'] = `@${value}`;
+          if (qZoteroTitle) props['title'] = `@${baseName}`;
           break;
         case 'itemType':
           props['item-type'] = wrapTag(value);
@@ -103,19 +118,8 @@ export class Page implements ZoteroPage {
     // create properties that are not in the original item
     props['links'] = `[Local library](zotero://select/library/items/${rawData.key})`;
 
-    let page = new Page();
-    page.title = props['title'];
-    for (const key of unwantedKeys) {
-      delete props[key];
-    }
-    page.props = props;
-    if (attachments) {
-      page.attachments = attachments.map(attachment => Attachment.fromRaw(attachment));
-    }
-    if (abstract) {
-      page.abstract = abstract;
-    }
-    return page
+    let page = new Page(props, attachments, abstract);
+    return page;
   }
 
   fromLogseq() {
