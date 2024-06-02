@@ -119,6 +119,9 @@ logseq
       key: 'alias_citationKey',
       type: 'boolean',
       default: false,
+      title: 'Option (Experimental): BetterBibTeX citationKey as page alias',
+      description: 'If you use [BetterBibTeX](https://github.com/retorquere/zotero-better-bibtex), this option adds `alias:: citationKey` to the page created. Also, `[[citationKey]]` will inserted at cursor, instead of `[[@___]]`. (Recommend: off)',
+    },
     {
       key: 'title_zotero_basename',
       type: 'boolean',
