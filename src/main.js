@@ -130,6 +130,13 @@ logseq
       description: 'Use the Zotero File Renaming rule (see the template in [Zotero tutorial](https://www.zotero.org/support/file_renaming)) to name the page `@___`. (Recommend: off)',
     },
     {
+      key: 'key_as_identifier',
+      type: 'boolean',
+      default: false,
+      title: 'Option (Experimental): Zotero DB key as page identifier',
+      description: "Identify a page by its property `key::`, which is the item key in Zotero's DB, instead of the page title. (Recommend: off)",
+    },
+    {
       key: 'unwanted_keys',
       type: 'string',
       inputAs: "textarea",

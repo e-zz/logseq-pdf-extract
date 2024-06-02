@@ -8,8 +8,9 @@ function parse_unwantedKeys() {
     return [];
   } else {
     unwantedKeys = unwantedKeys.split(/[\n,\s]+/);
-    if (logseq.settings?.alias_citationKey && unwantedKeys.includes('alias')) {
-      unwantedKeys.splice(unwantedKeys.indexOf('alias'), 1);
+    }
+    if (logseq.settings?.key_as_identifier) {
+      unwantedKeys = unwantedKeys.filter(key => key !== 'key');
     }
     return unwantedKeys;
   }
@@ -35,7 +36,7 @@ const defaultUnwantedKeys = [
   'dateAdded',
   'dateModified',
   'collections',
-  'key',
+  // 'key',
   'attachments',
   'relations',
   'version'
@@ -155,6 +156,19 @@ export class Page implements ZoteroPage {
 
   async imported() {
     // FIXME maybe empty page should be considered as not imported
+    if (logseq.settings?.key_as_identifier) {
+      // use Zotero DB key as identifier and check if the page exists
+      const lsqPage = await logseq.DB.datascriptQuery(
+        `[:find ?p
+            :where
+            [?p :block/name ?name]
+            [?p :block/properties-text-values ?prop]
+            [(get ?prop :key) ?key]
+            [(= ?key "${this.props['key']}")]
+        ]`
+      );
+      return lsqPage != null;
+    }
     let lsqPage = await logseq.Editor.getPage(this.title)
     return lsqPage != null;
   }
