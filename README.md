@@ -332,7 +332,7 @@ Coding Assistance
 
 # Support
 
-Find this plugin useful? [Buy me a coffee](https://www.buymeacoffee.com/e.zz) ☕️ or you could support my favorite Logseq plugins and their developers. It's also a great help for me.
+Find this plugin useful? ~~Buy me a coffee ☕️~~ (Unfortunately, I lost the access to my Buymeacoffee account. @Hira G. Thank for supporting me!) or you could support my favorite Logseq plugins and their developers. It's also a great help for me.
 
 -   [debanjandhar12/logseq-anki-sync](https://github.com/debanjandhar12/logseq-anki-sync): I love its idea of keeping links to Logseq blocks in Anki cards. It has significantly enhanced my experience of reviewing and updating cards on Anki mobile.
 -   [haydenull/logseq-plugin-agenda](https://github.com/haydenull/logseq-plugin-agenda): a game changer for task management.
