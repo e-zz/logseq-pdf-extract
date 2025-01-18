@@ -1,4 +1,5 @@
 
+import { PageIdentity } from "@logseq/libs/dist/LSPlugin.user";
 import { Attachment } from "./attachment";
 
 let unwantedKeys;
@@ -143,6 +144,16 @@ export class Page implements ZoteroPage {
     this.insertAliasRef();
   }
 
+  async updateAlias(page: PageIdentity, alias_key: string) {
+    // updateBlock is preferred over upsertBlockProperty due to the reason mentioned in https://plugins-doc.logseq.com/logseq/Editor/upsertBlockProperty
+    await logseq.Editor.upsertBlockProperty(page.uuid, "alias", wrapTag(alias_key));
+    console.log(await logseq.Editor.getBlock(page.uuid));
+
+    console.log("updateAlias", page.uuid, page.properties);
+
+    // logseq.Editor.updateBlock(page,);
+  }
+
   insertRef() {
     // [[@title]]
     logseq.Editor.insertAtEditingCursor(wrapTag(this.title));
@@ -210,6 +221,15 @@ export class Page implements ZoteroPage {
       } else {
         logseq.UI.showMsg("Import failed for " + page);
       }
+    } else {
+      // If imported, check if the citation key alias needs to be updated
+      if (logseq.settings?.alias_citationKey) {
+        // TODO check if the alias needs to be updated
+        // logseq.Editor.updatePage(this.title, { alias: this.props['alias'] });
+        let lsqPage = await logseq.Editor.getPage(this.title)
+        this.updateAlias(lsqPage, this.props['alias']);
+      }
+
     }
   }
 }
