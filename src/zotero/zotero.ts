@@ -92,7 +92,7 @@ export class Zotero {
           }
         }
 
-        if (i < items.items.length - 1) logseq.Editor.insertAtEditingCursor('\n');
+        if (i < items.items.length - 1) logseq.Editor.insertAtEditingCursor(' \n');
 
       }
     }
