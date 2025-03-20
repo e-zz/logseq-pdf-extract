@@ -65,6 +65,10 @@ export class Zotero {
     // import items to cursor
     // if items is empty, import se
     await Promise.all(items.map(item => item.page.safeImport()));
+    // TODO. Refactor
+    // 1. avant_import hooks: check page existance, check import settings (e.g. alias, template. LATER: in future, possibly allow to force update by overwriting, or update by merging)
+    // 2. import: template string (page metadata) of a single entry, button
+    // 3. apres_import hooks: notification, write to cursor
     if (debug_zotero) console.log("in Zotero.safeImportToCursor\titems:", items);
 
     if (await logseq.Editor.checkEditing()) {
@@ -91,6 +95,14 @@ export class Zotero {
             if (atta.contentType === 'application/pdf') atta.insertButton()
           }
         }
+
+        // TODO template string for inserToCursor
+        // if (logseq.settings.insert_button && itemPage.hasAttachment()) {
+        //   for (let j = 0; j < itemPage.attachments.length; j++) {
+        //     let atta = itemPage.attachments[j];
+        //     if (atta.contentType === 'application/pdf') atta.button
+        //   }
+        // }
 
         if (i < items.items.length - 1) logseq.Editor.insertAtEditingCursor(' \n');
 
