@@ -83,11 +83,18 @@ export class Zotero {
         // TODO option: insert title or page Ref
         // itemPage.insertTitle();
 
-        if (qAlias) {
-          itemPage.safeInsertAliasRef();
-        } else {
-          itemPage.insertRef();
+        // if (qAlias) {
+        //   itemPage.safeInsertAliasRef();
+        // } else {
+        //   itemPage.insertRef();
+        // }
+
+        if (itemPage.props['alias'] != undefined) {
+          logseq.Editor.insertAtEditingCursor(itemPage.props['alias']);
+          if (debug_zotero) console.log("in Zotero.safeImportToCursor\talias", itemPage.props['alias']);
         }
+        itemPage.insertRef();
+
 
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
           for (let j = 0; j < itemPage.attachments.length; j++) {
