@@ -172,9 +172,14 @@ export class Page implements ZoteroPage {
     await logseq.Editor.updateBlock(props.uuid, block_content);
   }
 
+  ref() {
+    // [[@title]]
+    return wrapTag(this.title);
+  }
+
   insertRef() {
     // [[@title]]
-    logseq.Editor.insertAtEditingCursor(wrapTag(this.title));
+    logseq.Editor.insertAtEditingCursor(this.ref());
   }
 
   insertTitle() {
