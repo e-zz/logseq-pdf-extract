@@ -165,7 +165,7 @@ Date: {{date}}
 Journal Abbreviation: {{journal-abbreviation}}`,
       title: 'Template for Zotero items',
       // TODO add link to the doc of template
-      description: 'Use `{{ref}}` as placeholder for Zotero item reference. Use `{{pdfButton}}` as placeholder for PDF open button. For example: `{{ref}} {{pdfButton}}`',
+      description: 'See [the explanation of template](https://github.com/e-zz/logseq-pdf-extract/wiki/Template-for-the-%60import-at-cursor%60-function) for more details.',
     },
     {
       key: 'unwanted_keys',
