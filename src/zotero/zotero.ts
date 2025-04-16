@@ -61,10 +61,30 @@ export class Zotero {
     return queryRes;
   }
 
+  // TODO implement the function returning a string according to the template
+  static async to_cursor_template(props: any, template: string) {
+    let res = template;
+    for (const [key, value] of Object.entries(props)) {
+      if (value) {
+        res = res.replace(`{{${key}}}`, value);
+      }
+    }
+    // check if template has been filled
+    if (res === template) {
+      console.warn("Zotero.to_cursor_template: template not filled");
+      return "Zotero.to_cursor_template: template not filled";
+    }
+    return res;
+  }
+        
   static async safeImportToCursor(items: ZoteroItems) {
     // import items to cursor
     // if items is empty, import se
     await Promise.all(items.map(item => item.page.safeImport()));
+    // TODO. Refactor
+    // 1. avant_import hooks: check page existance, check import settings (e.g. alias, template. LATER: in future, possibly allow to force update by overwriting, or update by merging)
+    // 2. import: template string (page metadata) of a single entry, button
+    // 3. apres_import hooks: notification, write to cursor
     if (debug_zotero) console.log("in Zotero.safeImportToCursor\titems:", items);
 
     if (await logseq.Editor.checkEditing()) {
@@ -74,26 +94,39 @@ export class Zotero {
       if (debug_zotero) console.log("q_alias", qAlias);
 
       for (let i = 0; i < items.items.length; i++) {
-
         let itemPage = items.items[i].page;
-        // TODO option: insert title or page Ref
-        // itemPage.insertTitle();
-
-        if (qAlias) {
-          itemPage.safeInsertAliasRef();
-        } else {
-          itemPage.insertRef();
-        }
-
+        let props = itemPage.props;
+        
+        // Add props['pdfButton'] if the item has attachments
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
+          const pdfButtons = [];
           for (let j = 0; j < itemPage.attachments.length; j++) {
             let atta = itemPage.attachments[j];
-            if (atta.contentType === 'application/pdf') atta.insertButton()
+            if (atta.contentType === 'application/pdf') {
+              // Get the button and add to array
+              const button = atta.button || '';
+              if (button) {
+                pdfButtons.push(button);
+              }
+            }
+          }
+          // Add the collected PDF buttons to props
+          if (pdfButtons.length > 0) {
+            props['pdfButton'] = pdfButtons.join(' ');
           }
         }
 
-        if (i < items.items.length - 1) logseq.Editor.insertAtEditingCursor(' \n');
+        // extra props or keys
+        props['ref'] = itemPage.ref();
+        props['abstract'] = itemPage.abstract;
+        props['year'] = props['date']?.split('-')[0];
+        props['journal'] = props['publication-title'];
 
+        if (debug_zotero) console.log("in Zotero.safeImportToCursor\titemPage.props:", props);
+        
+        let entry = await this.to_cursor_template(props, logseq.settings?.insert_template);
+
+        logseq.Editor.insertAtEditingCursor(entry)
       }
     }
   }

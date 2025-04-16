@@ -130,6 +130,44 @@ logseq
       description: 'Use the Zotero File Renaming rule (see the template in [Zotero tutorial](https://www.zotero.org/support/file_renaming)) to name the page `@___`. (Recommend: off)',
     },
     {
+      key: 'insert_template',
+      type: 'string',
+      inputAs: "textarea",
+      default: `# {{title}}
+
+Metadata
+**Original Title**: {{original-title}}
+**Authors**: {{authors}}
+**Year**: {{year}}
+**Type**: {{item-type}}
+**Publication**: {{journal}}
+**DOI**: {{doi}}
+**URL**: {{url}}
+**Citation Key**: {{alias}}
+**Tags**: {{tags}}
+**Links**: {{links}}
+
+Reference
+{{ref}}
+
+PDF Access
+{{pdfButton}}
+
+Abstract
+{{abstract}}
+
+Additional Info
+Volume: {{volume}}
+Issue: {{issue}}
+Pages: {{pages}}
+Publisher: {{publisher}}
+Date: {{date}}
+Journal Abbreviation: {{journal-abbreviation}}`,
+      title: 'Template for Zotero items',
+      // TODO add link to the doc of template
+      description: 'Use `{{ref}}` as placeholder for Zotero item reference. Use `{{pdfButton}}` as placeholder for PDF open button. For example: `{{ref}} {{pdfButton}}`',
+    },
+    {
       key: 'unwanted_keys',
       type: 'string',
       inputAs: "textarea",
