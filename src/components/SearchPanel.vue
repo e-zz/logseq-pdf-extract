@@ -40,6 +40,7 @@ const selectedItemIndex = ref(0);
 const delay = logseq.settings?.search_delay || 100;
 const opts = inject('opts')
 let lastSearch = searchText.value;
+let zotero = new Zotero();
 
 if (__debug) console.log(opts.value.isDark);
 
@@ -101,11 +102,14 @@ const search = async () => {
   if (searchText.value === '') {
     res = await Zotero.getSelectedRawItems();
   } else {
-    res = await Zotero.search(searchText.value)
+    res = await zotero.search(searchText.value)
   }
+  // remove attachments or notes
+  // TODO ref Zapi: ItemType=-attachment
   items.value = res.filter((item) => !item.parentItem);
   // Use Fuse to sort items
   const result = fuse(items).search(searchText.value);
+  
   items.value = result.map(({ item }) => item);
 }
 
@@ -171,7 +175,7 @@ const onClickItem = (key, event) => {
 const insert = async (key) => {
   if (__debug) console.log("clicked item key=", key);
 
-  let res = await Zotero.getByKeys([key,])
+  let res = await zotero.getByKeys([key,])
   res = await Zotero.safeImportToCursor(res)
 
 }

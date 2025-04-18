@@ -1,6 +1,6 @@
 // Customized searches and post-process based on the Zotero API
 
-import { Zapi } from "./zapi"
+import { Zapi, Zapi7 } from "./zapi"
 import { ZoteroItems } from "./item";
 
 
@@ -8,14 +8,26 @@ import { ZoteroItems } from "./item";
 export class Zotero {
   // A wrapper of set of functions based on Zotero API
 
-  static async search(keyword: string) {
-    let res = await Zapi.getByEverything(keyword)
+  api: Zapi7 | Zapi; // Zotero 7 API or Zotserver API
+
+  constructor() {
+    // TODO check Zotero7 or Zotserver automatically
+    if (logseq.settings?.zotero_ver === 'Zotero 7') {
+      this.api = new Zapi7();
+    }
+    else {
+      this.api = new Zapi();
+    }
+  }
+
+  async search(keyword: string) {
+    let res = await this.api.getByEverything(keyword)
     if (debug_zotero) console.log("in Zotero.search:\t", res);
     return res
   }
 
-  static async getByKeys(keys: string[]) {
-    let res = await Zapi.getItemByKeys(keys);
+  async getByKeys(keys: string[]) {
+    let res = await this.api.getItemByKeys(keys);
     if (res) {
       res = ZoteroItems.fromRaw(res);
 
@@ -76,7 +88,7 @@ export class Zotero {
     }
     return res;
   }
-        
+
   static async safeImportToCursor(items: ZoteroItems) {
     // import items to cursor
     // if items is empty, import se
@@ -96,7 +108,7 @@ export class Zotero {
       for (let i = 0; i < items.items.length; i++) {
         let itemPage = items.items[i].page;
         let props = itemPage.props;
-        
+
         // Add props['pdfButton'] if the item has attachments
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
           const pdfButtons = [];
@@ -123,7 +135,7 @@ export class Zotero {
         props['journal'] = props['publication-title'];
 
         if (debug_zotero) console.log("in Zotero.safeImportToCursor\titemPage.props:", props);
-        
+
         let entry = await this.to_cursor_template(props, logseq.settings?.insert_template);
 
         logseq.Editor.insertAtEditingCursor(entry)

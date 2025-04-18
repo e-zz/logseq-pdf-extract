@@ -1,15 +1,26 @@
-export class Zapi {
+export interface ZoteroAPI {
+    BASE_URL: string;
+    API_ENDPOINT: string;
+    API: {};
+    // function getByEverything
+    getByEverything(query: string): Promise<any>;
+    // function search
+    search(conditions: any): Promise<any>;
+
+}
+
+export class Zapi implements ZoteroAPI {
     // Adapted from https://github.com/cboulanger/excite-docker/web/web/scripts.js
 
-    static controller;
-    static BASE_URL = `http://localhost:23119/`;
-    static API_ENDPOINT = this.BASE_URL + "zotserver";
+    static controller: AbortController;
+    BASE_URL = `http://localhost:23119/`;
+    API_ENDPOINT = this.BASE_URL + "zotserver";
     // timeout 2 minutes
     static timeout = 2 * 60 * 1000;
     static isTimeout = false;
     static numberTimeouts = 0;
 
-    static API = {
+    API = {
         // SELECTION_GET: this.API_ENDPOINT + "/selection/get",
         ITEM_ATTACHMENT_GET_BY_KEY: this.API_ENDPOINT + "/get",
         SELECTED_ITEM_ATTACHMENT_GET: this.API_ENDPOINT + "/selected",
@@ -25,7 +36,7 @@ export class Zapi {
      * @returns {Promise<*>}
      */
 
-    static async callEndpoint(endpoint, postData = null) {
+    static async callEndpoint(endpoint: any, postData: any = null) {
         this.controller = new AbortController();
         this.isTimeout = false;
         const timeoutFunc = () => {
@@ -65,15 +76,15 @@ export class Zapi {
             clearTimeout(id);
         }
     }
-    static async search(conditions: any) {
-        return await this.callEndpoint(
+    async search(conditions: any) {
+        return await Zapi.callEndpoint(
             this.API.LIBRARY_SEARCH,
             conditions
         )
     }
-    static async getByEverything(query: string) {
+    async getByEverything(query: string) {
 
-        return await this.callEndpoint(
+        return await Zapi.callEndpoint(
             this.API.LIBRARY_SEARCH,
             {
                 condition: 'quicksearch-everything',
@@ -82,9 +93,9 @@ export class Zapi {
         )
     }
 
-    static async getByTitleCreatorYear(query: string) {
+    async getByTitleCreatorYear(query: string) {
 
-        return await this.callEndpoint(
+        return await Zapi.callEndpoint(
             this.API.LIBRARY_SEARCH,
             {
                 condition: 'quicksearch-titleCreatorYear',
@@ -93,9 +104,9 @@ export class Zapi {
         )
     }
 
-    static async getByTag(tag: string) {
+    async getByTag(tag: string) {
 
-        return await this.callEndpoint(
+        return await Zapi.callEndpoint(
             this.API.LIBRARY_SEARCH,
             {
                 condition: 'tag',
@@ -105,28 +116,221 @@ export class Zapi {
         )
     }
 
-    static async getItemByKeys(keys: string[]) {
-        return await this.callEndpoint(
+    async getItemByKeys(keys: string[]) {
+        return await Zapi.callEndpoint(
             this.API.ITEM_ATTACHMENT_GET_BY_KEY,
             keys
         )
     }
-    static async getAttachmentByKeys(keys: string[]) {
-        return await this.callEndpoint(
+    async getAttachmentByKeys(keys: string[]) {
+        return await Zapi.callEndpoint(
             this.API.ITEM_ATTACHMENT_GET_BY_KEY,
             keys
         )
     }
 
-    static async getBySelection() {
-        return await this.callEndpoint(
+    async getBySelection() {
+        return await Zapi.callEndpoint(
             this.API.SELECTED_ITEM_ATTACHMENT_GET,
         )
     }
-    static async test_getAttachmentByKeys() {
+    async test_getAttachmentByKeys() {
         let keys = ["98GXDB7I"];
         let attachments = await this.getAttachmentByKeys(keys);
         console.log(attachments);
     }
 }
 
+export class Zapi7 implements ZoteroAPI {
+    // Zotero 7 Local API
+    // https://github.com/zotero/zotero/blob/a7778b93e841ce62773efc65cd86576c7bfe8af1/chrome/content/zotero/xpcom/localAPI/server_localAPI.js
+
+    static BASE_URL = `http://127.0.0.1:23119/api`;
+    static userOrGroup = 'users/0'
+    static API_ENDPOINT = `${this.BASE_URL}/${this.userOrGroup}`;
+
+    static API = {
+        ITEMS: this.API_ENDPOINT + "/items",
+    }
+
+    async getItem(query: string, options: Record<string, string> = {}): Promise<any> {
+        const parameters = {
+            q: query,
+            qmode: 'everything',
+            itemType: '-attachment',
+            ...options // Allow overriding defaults
+        };
+
+        const queryString = new URLSearchParams(parameters).toString();
+        const url = `${Zapi7.API.ITEMS}?${queryString}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Status:', response.status);
+            console.log('Content-Type:', response.headers.get('Content-Type'));
+
+            return response.json();
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            throw error;
+        }
+    }
+
+    async getByEverything(query: string, options: Record<string, string> = {}): Promise<any> {
+        let res = await this.getItem(query, options);
+
+        // format the response by keeping only the data field
+        res = res.map((i: any) => i.data)
+        if (debug_zotero) console.log("in Zotero.getByEverything:\t", res);
+
+        return res
+    }
+
+    async search(conditions: any): Promise<any> {
+
+    }
+
+    async getAttachmentByURL(attachmentUrl: string) {
+        const attachmentResponse = await fetch(attachmentUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Parse attachment JSON
+        const attachmentData = await attachmentResponse.json();
+        return attachmentData['data'];
+    }
+
+    /**
+     * Fetches all attachments for a given parent item by its key
+     * @param key The Zotero item key of the parent item
+     * @returns An array of attachment data objects
+     * @throws Error if the API request fails or returns a non-200 status
+     */
+    async getAttachmentsByParentKey(key: string): Promise<any[]> {
+        const url = `${Zapi7.API.ITEMS}/${key}/children`;
+
+        try {
+            // Make request to get children items
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // Handle unsuccessful responses
+            if (!response.ok) {
+                throw new Error(`Failed to fetch attachments: ${response.status} ${response.statusText}`);
+            }
+
+            // Parse JSON response
+            const attachments = await response.json();
+
+            if (debug_zotero) {
+                console.log("Fetched attachments for item:", key);
+                console.log("Status:", response.status);
+                console.log("Attachment count:", attachments.length);
+            }
+
+            // Extract only the data field from each attachment
+            return attachments
+                .filter((attachment: any) => attachment?.data)
+                .map((attachment: any) => attachment.data);
+        } catch (error) {
+            console.error(`Error fetching attachments for item ${key}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Fetches items by their Zotero item keys and transforms the response to match expected format
+     * @param keys Array of Zotero item keys to fetch
+     * @returns Array of items with their attachments
+     * @throws Error if the API request fails or returns a non-200 status
+     */
+    async getItemByKeys(keys: string[]): Promise<any[]> {
+        if (!keys || keys.length === 0) {
+            return [];
+        }
+
+        // Build the query parameters
+        const parameters = {
+            itemKey: keys.join(',')
+        };
+
+        const queryString = new URLSearchParams(parameters).toString();
+        const url = `${Zapi7.API.ITEMS}?${queryString}`;
+
+        try {
+            // Fetch items by their keys
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error fetching items: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            if (debug_zotero) {
+                console.log("Fetched items:", data.length);
+                console.log("API URL:", url);
+            }
+
+            // Transform API response to match expected format
+            const transformedData = await Promise.all(data.map(async (item: any) => {
+                // Create the base result structure
+                const result = {
+                    item: item.data,
+                    citationKey: item.data.citationKey || '',
+                    attachments: [],
+                    aux: {
+                        baseName: item.data?.title || ''
+                    }
+                };
+
+                // Skip attachment processing if no attachments
+                if (!item.links?.attachment) {
+                    return result;
+                }
+
+                try {
+                    // Fetch attachments for this item
+                    const attachmentsData = await this.getAttachmentsByParentKey(item.key);
+                    result.attachments = attachmentsData;
+                    return result;
+                } catch (error) {
+                    console.error(`Error fetching attachments for item ${item.key}:`, error);
+                    return result; // Return item without attachments on error
+                }
+            }));
+
+            if (debug_zotero) {
+                console.log("Transformed data complete");
+            }
+
+            return transformedData;
+        } catch (error) {
+            console.error(`Error in getItemByKeys:`, error);
+            throw error;
+        }
+    }
+
+}

@@ -102,6 +102,15 @@ logseq
       default: 'mod+alt+z',
     },
     {
+      key: 'zotero_ver',
+      type: 'enum',
+      title: 'Zotero version',
+      description: 'Select the version of Zotero you are using.',
+      default: 'Zotero 6',
+      enumChoices: ['Zotero 6', 'Zotero 7'],
+      enumPicker: 'select'
+    },
+    {
       key: 'search_delay',
       type: 'string',
       title: 'Delay (ms) between typing and responsive search',
