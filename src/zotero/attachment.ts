@@ -33,7 +33,7 @@ export class Attachment {
     file.localLink = `zotero://select/library/items/${raw.key}`;
     file.linkMode = raw.linkMode;
     file.contentType = raw.contentType;
-    file.localLink = `zotero://select/library/items/${raw.key}`;
+    
 
     if (debug_zotero) {
       console.log("file:", file);
