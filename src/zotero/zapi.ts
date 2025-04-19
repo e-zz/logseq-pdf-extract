@@ -198,6 +198,14 @@ export class Zapi7 implements ZoteroAPI {
         return res
     }
 
+    async getRecentModified(): Promise<any> {
+        const url = `${Zapi7.API.ITEMS}?itemType=-attachment&sort=dateModified&limit=100`;
+        const res = await Zapi7.CallEndpoint(url);
+        // format the response by keeping only the data field
+        return res.map((i: any) => i.data);
+    }
+
+
     async search(conditions: any): Promise<any> {
 
     }
