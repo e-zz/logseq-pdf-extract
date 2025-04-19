@@ -100,17 +100,17 @@ const search = async () => {
   selectedItemIndex.value = 0;
   let res;
   if (searchText.value === '') {
-    res = await Zotero.getSelectedRawItems();
+    items.value = await zotero.api.getRecentModified();
   } else {
     res = await zotero.search(searchText.value)
+    // remove attachments or notes
+    // TODO ref Zapi: ItemType=-attachment
+    items.value = res.filter((item) => !item.parentItem);
+    // Use Fuse to sort items
+    const result = fuse(items).search(searchText.value);
+    items.value = result.map(({ item }) => item);
   }
-  // remove attachments or notes
-  // TODO ref Zapi: ItemType=-attachment
-  items.value = res.filter((item) => !item.parentItem);
-  // Use Fuse to sort items
-  const result = fuse(items).search(searchText.value);
   
-  items.value = result.map(({ item }) => item);
 }
 
 const author_format = (creator) => {
@@ -139,7 +139,7 @@ const onInput = () => {
   clearTimeout(timeoutId);
   timeoutId = setTimeout(() => {
     const newSearch = searchText.value.trim();
-    if (lastSearch !== newSearch) {
+    if (lastSearch !== newSearch || newSearch === '') {
       search();
       lastSearch = newSearch;
     }
