@@ -153,6 +153,26 @@ export class Zapi7 implements ZoteroAPI {
         ITEMS: this.API_ENDPOINT + "/items",
     }
 
+    static CallEndpoint(url: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            fetch(url, {
+                method: "GET",
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => resolve(data))
+                .catch((error) => reject(error));
+        });
+    }
+
     async getItem(query: string, options: Record<string, string> = {}): Promise<any> {
         const parameters = {
             q: query,
@@ -164,24 +184,10 @@ export class Zapi7 implements ZoteroAPI {
         const queryString = new URLSearchParams(parameters).toString();
         const url = `${Zapi7.API.ITEMS}?${queryString}`;
 
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            console.log('Status:', response.status);
-            console.log('Content-Type:', response.headers.get('Content-Type'));
-
-            return response.json();
-        } catch (error) {
-            console.error('Error fetching items:', error);
-            throw error;
-        }
+        return await Zapi7.CallEndpoint(url);
     }
 
+    // Get items data
     async getByEverything(query: string, options: Record<string, string> = {}): Promise<any> {
         let res = await this.getItem(query, options);
 
@@ -219,25 +225,10 @@ export class Zapi7 implements ZoteroAPI {
         const url = `${Zapi7.API.ITEMS}/${key}/children`;
 
         try {
-            // Make request to get children items
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            // Handle unsuccessful responses
-            if (!response.ok) {
-                throw new Error(`Failed to fetch attachments: ${response.status} ${response.statusText}`);
-            }
-
-            // Parse JSON response
-            const attachments = await response.json();
+            const attachments = await Zapi7.CallEndpoint(url);
 
             if (debug_zotero) {
                 console.log("Fetched attachments for item:", key);
-                console.log("Status:", response.status);
                 console.log("Attachment count:", attachments.length);
             }
 
@@ -271,23 +262,8 @@ export class Zapi7 implements ZoteroAPI {
         const url = `${Zapi7.API.ITEMS}?${queryString}`;
 
         try {
-            // Fetch items by their keys
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
 
-            if (!response.ok) {
-                throw new Error(`Error fetching items: ${response.status} ${response.statusText}`);
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
+            const data = await Zapi7.CallEndpoint(url);
 
             if (debug_zotero) {
                 console.log("Fetched items:", data.length);
@@ -311,20 +287,13 @@ export class Zapi7 implements ZoteroAPI {
                     return result;
                 }
 
-                try {
-                    // Fetch attachments for this item
-                    const attachmentsData = await this.getAttachmentsByParentKey(item.key);
-                    result.attachments = attachmentsData;
-                    return result;
-                } catch (error) {
-                    console.error(`Error fetching attachments for item ${item.key}:`, error);
-                    return result; // Return item without attachments on error
-                }
-            }));
+                // Fetch attachments for this item
+                const attachmentsData = await this.getAttachmentsByParentKey(item.key);
 
-            if (debug_zotero) {
-                console.log("Transformed data complete");
-            }
+                result.attachments = attachmentsData;
+
+                return result;
+            }));
 
             return transformedData;
         } catch (error) {
