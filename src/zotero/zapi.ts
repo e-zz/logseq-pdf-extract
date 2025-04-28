@@ -178,7 +178,7 @@ export class Zapi7 implements ZoteroAPI {
             q: query,
             qmode: 'everything',
             itemType: '-attachment',
-            limit: 100,
+            limit: "100",
             ...options // Allow overriding defaults
         };
 
