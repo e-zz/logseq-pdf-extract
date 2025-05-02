@@ -90,7 +90,15 @@ export class Page implements ZoteroPage {
           break;
         case 'creators':
           // TODO check creatorType (usually 'author', but can be other values )
-          props['authors'] = value.map(creator => wrapTag(creator.firstName + ' ' + creator.lastName)).join(', ');
+          props['authors'] = value.map(creator => {
+            if ('name' in creator) {
+              // Handle organizational authors with single 'name' field
+              return wrapTag(creator.name);
+            } else {
+              // Handle regular authors with firstName and lastName
+              return wrapTag(creator.firstName + ' ' + creator.lastName);
+            }
+          }).join(', ');
           break;
         case 'tags':
           if (value.length == 0) break;
@@ -248,7 +256,7 @@ export class Page implements ZoteroPage {
       // If imported, check if the citation key alias needs to be updated
       if (logseq.settings?.alias_citationKey) {
         let lsqPage = await logseq.Editor.getPage(this.title)
-        this.updateAlias(lsqPage.uuid, this.props['alias']);
+        this.updateAlias(lsqPage.uuid, this.props['citationKey']);
         // FIXME handle the case when page with the same name or alias exists
       }
 
