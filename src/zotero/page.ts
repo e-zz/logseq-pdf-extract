@@ -29,6 +29,19 @@ function camelToKebab(camelCase: string): string {
   return camelCase.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
+function extra2citationKey(extra: string): string {
+  // Retrieve the citation key from the extra field
+  // "arXiv:2501.13459 [quant-ph]\nCitation Key: yu2025a"
+  let key = extra.split('\n').find(line => line.startsWith('Citation Key:'));
+
+  if (key) {
+    key = key.split(':')[1].trim();
+  } else {
+    key = ''; // or some default value
+  }
+  return key;
+}
+
 const wrapTag = (tag: string) => `[[${tag}]]`;
 
 // TODO combine this with unwantedKeys in settings (use the list below as default)
@@ -41,6 +54,16 @@ const defaultUnwantedKeys = [
   'relations',
   'version'
 ];
+
+async function createPage(title: string, props: { [key: string]: any }) {
+  await logseq.Editor.createPage(
+    title,
+    props,
+    {
+      format: logseq.App.getUserConfigs()["prefferedFormat"],
+      redirect: false
+    });
+}
 
 export class Page implements ZoteroPage {
   // TODO can this cover all the fields in ZoteroRawItem ?
@@ -71,7 +94,6 @@ export class Page implements ZoteroPage {
     let abstract;
     let baseName = aux?.baseName;
 
-    const qAlias: boolean = logseq.settings?.alias_citationKey;
     const qZoteroTitle: boolean = logseq.settings?.title_zotero_basename;
 
     // TODO note 
@@ -110,10 +132,11 @@ export class Page implements ZoteroPage {
         case 'abstractNote':
           abstract = value;
           break;
-        case 'citationKey':
-          if (qAlias) {
-            props['alias'] = wrapTag(value);
-          }
+        // case 'citationKey':
+        //   props['alias'] = wrapTag(value);
+        //   break;
+        case 'extra':
+          props['citationKey'] = extra2citationKey(value);
           break;
         default:
           // remove unwanted keys
@@ -226,14 +249,25 @@ export class Page implements ZoteroPage {
 
   async executeImport() {
     // creates @xxx page, 
-    await this.create();
+    let props = this.props;
+
+    // User settings for citationKey alias
+    if (logseq.settings?.alias_citationKey) {
+      // if alias is not set, set it to the title
+      props['alias'] = wrapTag(props["citationKey"]);
+    } else {
+      delete props['alias'];
+    }
+    delete props["citationKey"]; // By default, citationKey is not a page property
+
+    if (debug_zotero) console.log("in executeImport", props, this.attachments, await this.imported());
+    await createPage(this.title, props);
     await this.importAbstract();
     await this.importAttachments();
   }
 
   async safeImport() {
     // check if the item is already imported. If not, import it.
-    if (debug_zotero) console.log("in safeImport", this.props, this.attachments, await this.imported());
 
     if (!await this.imported()) {
 
