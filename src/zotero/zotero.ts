@@ -79,6 +79,8 @@ export class Zotero {
     for (const [key, value] of Object.entries(props)) {
       if (value) {
         res = res.replace(`{{${key}}}`, value);
+      } else {
+        res = res.replace(`{{${key}}}`, '');
       }
     }
     // check if template has been filled
