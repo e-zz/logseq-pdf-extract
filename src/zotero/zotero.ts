@@ -76,6 +76,19 @@ export class Zotero {
   // TODO implement the function returning a string according to the template
   static async to_cursor_template(props: any, template: string) {
     let res = template;
+
+    // Handle fallback syntax first: {{primary:fallback}}
+    res = res.replace(/{{([\w-]+):([\w-]+)}}/g, (match, primary, fallback) => {
+      if (props[primary] && props[primary].toString().trim()) {
+        return props[primary];
+      } else if (props[fallback] && props[fallback].toString().trim()) {
+        return props[fallback];
+      } else {
+        return '';
+      }
+    });
+
+
     for (const [key, value] of Object.entries(props)) {
       if (value) {
         res = res.replace(`{{${key}}}`, value);
