@@ -14,7 +14,7 @@ Search for "PDF Extract" in the Logseq plugin store and install it. Or you could
 If you are using this plugin for the first time, follow these steps after installation:
 
 <details>
-  <summary>❗ To enable TeX OCR of area highlights</summary>
+  <summary>⚙ To enable TeX OCR of area highlights</summary>
 
 -   To use the OCR service from Hugging Face,
 
@@ -25,8 +25,9 @@ If you are using this plugin for the first time, follow these steps after instal
 </details>
 
 <details>
-  <summary>❗ To enable Zotero-related features </summary>
-<b>For Zotero 7:</b> make sure Zotero is running and turn on `Advanced -> Allow other applications on this computer to communicate with Zotero`.
+  <summary>⚙ To enable Zotero-related features </summary>
+<b>For Zotero 7:</b> make sure Zotero is running and turn on <b>For Zotero 7:</b> make sure Zotero is running and turn on <code>Edit -> Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero</code>.
+
 <hr>
 <b>For Zotero 6:</b> make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero following the steps below:
 
@@ -43,7 +44,7 @@ Now you can import stuff by using the slash command `/PDF: show search panel` or
 Also, to view PDFs imported from Zotero, it's better to specify these two paths in your settings:
 
 <details>
-  <summary> Two things possibly required by PDF "open" buttons: </summary>
+  <summary>⚙ Two things possibly required by PDF "open" buttons: </summary>
   
 > - Go to Logseq's [Zotero settings](https://docs.logseq.com/#/page/zotero) in menu.
 > - Fill in below paths by your needs (as outlined in the [Logseq Documentation](https://docs.logseq.com/#/page/658992ea-67b3-4a06-9c93-6fd3c58a3af9)):
