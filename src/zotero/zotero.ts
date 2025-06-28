@@ -83,6 +83,10 @@ export class Zotero {
         res = res.replace(`{{${key}}}`, '');
       }
     }
+
+    // if a key used in the template is not in props, remove it
+    res = res.replace(/{{[\w-]+}}/g, '');
+
     // check if template has been filled
     if (res === template) {
       console.warn("Zotero.to_cursor_template: template not filled");
