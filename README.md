@@ -235,7 +235,7 @@ item-type
 This is requested by https://github.com/e-zz/logseq-pdf-extract/issues/8#issuecomment-1900524449 
 
 #### Enable the Zotero-style title
-Follow the Zotero File naming style (see the [template in Zotero tutorial](https://www.zotero.org/support/file_renaming)) for pages created by importing from Zotero.
+Follow the Zotero File naming style for pages created by importing from Zotero. For customization, you need to configure in Zotero. See the [Zotero tutorial](https://www.zotero.org/support/file_renaming).
 
 This is a workaround for https://github.com/e-zz/logseq-pdf-extract/discussions/12 
 
