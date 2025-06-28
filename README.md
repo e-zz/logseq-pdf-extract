@@ -59,13 +59,13 @@ And that's all for it! 🎉
 
 ## 🚀 A Quick Guide
 
-### 1. Import Zotero Items 📚
+### 1. Import Zotero Items 📚 
 
 For a comparison between this and Logseq's native `/Zotero` command, see [#6](https://github.com/e-zz/logseq-pdf-extract/discussions/6).
 
 Currently, this plugin supports quick importing of **items selected in Zotero** or importing by **searching items in a popup panel**, as shown below. [More features are planned](#possible-improvements) and PRs welcome. If Better BibTeX enabled in Zotero, citation keys can also be imported. (See [alias citationKey](#alias_citationkey-experimental) for more details. This is an experimental feature.).
 
-**Import items selected in Zotero**
+#### 1.1 **Import items selected in Zotero** (Zotero 6 only)
 
 ![demonstration](importSelected.gif)
 
@@ -78,7 +78,7 @@ Currently, this plugin supports quick importing of **items selected in Zotero** 
 
 ---
 
-**Search panel**:
+#### 1.2 **Search panel**:
 
 ![search](searchPanel.gif)
 
@@ -195,6 +195,10 @@ Here is how we could take advantage of it:
 </details>
 
 ## ⚙ Settings
+#### `Zotero version`
+Select between `Zotero 6` or `Zotero 7`. Reload plugin or graph to take effect.
+
+Zotero 7 support is requested by https://github.com/e-zz/logseq-pdf-extract/issues/18 and https://github.com/e-zz/logseq-pdf-extract/issues/15 
 
 #### `search_delay`
 
@@ -214,6 +218,11 @@ If you turn this on, the citation key will be used as the `alias` for an item pa
 
 > For example, if the citation key is `Smith2021`, then the item page will have `alias:: [[Smith2021]]`. Also, the item will be inserted as `[[Smith2021]]` at cursor, instead of the full title.
 
+#### Template for Zotero items
+The template specifying how entries should be imported at cursor.
+See the [template](https://github.com/e-zz/logseq-pdf-extract/wiki/Template-for-the-%60import-at-cursor%60-function) for more details.
+
+
 #### `unwanted_keys`
 
 A list of item page property keys that you don't want to import. For example, if you don't want to import `original-title`, then add `original-title` to the list. Separate keys with commas or newlines, like this:
@@ -223,6 +232,12 @@ original-title, date,
 item-type
 
 ```
+This is requested by https://github.com/e-zz/logseq-pdf-extract/issues/8#issuecomment-1900524449 
+
+#### Enable the Zotero-style title
+Follow the Zotero File naming style (see the [template in Zotero tutorial](https://www.zotero.org/support/file_renaming)) for pages created by importing from Zotero.
+
+This is a workaround for https://github.com/e-zz/logseq-pdf-extract/discussions/12 
 
 #### `excerpt_style`: Template for Annotation Excerpts
 
