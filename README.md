@@ -26,15 +26,21 @@ If you are using this plugin for the first time, follow these steps after instal
 
 <details>
   <summary>❗ To enable Zotero-related features </summary>
-
-Make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero:
+<b>For Zotero 7:</b> make sure Zotero is running and turn on `Advanced -> Allow other applications on this computer to communicate with Zotero.
+<hr>
+<b>For Zotero 6:</b> make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero following the steps below:
 
 -   Follow the [Installation instruction of ZotServer](https://github.com/e-zz/ZotServer?tab=readme-ov-file#installation)
 -   If successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`
 
 Now you can import stuff by using the slash command `/PDF: show search panel` or pressing `Ctrl+Alt+z`. The shortcut only works in editing mode.
 
-Then to view PDFs imported, you might need to specify two paths in your settings:
+<hr>
+
+</details>
+
+
+Also, to view PDFs imported from Zotero, it's better to specify these two paths in your settings:
 
 <details>
   <summary> Two things possibly required by PDF "open" buttons: </summary>
@@ -44,13 +50,11 @@ Then to view PDFs imported, you might need to specify two paths in your settings
 >    - `Zotero data directory` for imported PDF attachment 
 >    - or `Linked Attachment Base Directory` for linked PDF attachment.
 
+<b>Explanation:</b> They tell Logseq where to look for those PDFs managed by Zotero. Otherwise, Logseq might crash when you click a PDF `open` button. A PDF file not in the graph folder is still a nightmare for Logseq. For the detailed mechanism, see my explanation in [this PR](https://github.com/logseq/logseq/pull/10430#issue-1967091728).
+
+</details>
+
 And that's all for it! 🎉
-
-This is to tell Logseq where to look for those PDFs managed by Zotero. Otherwise, Logseq might crash when you click a PDF `open` button because the PDF file is out of the current graph folder. For the detailed mechanism, see my explanation in [this PR](https://github.com/logseq/logseq/pull/10430#issue-1967091728).
-
-</details>
-
-</details>
 
 ## 🚀 A Quick Guide
 
