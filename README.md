@@ -29,7 +29,7 @@ If you are using this plugin for the first time, follow these steps after instal
 <b>For Zotero 7:</b> make sure Zotero is running and turn on <b>For Zotero 7:</b> make sure Zotero is running and turn on <code>Edit -> Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero</code>.
 
 <hr>
-<b>For Zotero 6:</b> make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero following the steps below:
+<b>For Zotero 6:</b> make sure Zotero is running and the plugin ZotServer is successfully installed in Zotero following the steps below:
 
 -   Follow the [Installation instruction of ZotServer](https://github.com/e-zz/ZotServer?tab=readme-ov-file#installation)
 -   If successfully installed, open `http://localhost:23119/` in browser and you should see `No endpoint found`
