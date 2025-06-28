@@ -52,7 +52,8 @@ const defaultUnwantedKeys = [
   'key',
   'attachments',
   'relations',
-  'version'
+  'version',
+  'citationKey', // citationKey is not a page property by default, but can be used as an alias
 ];
 
 async function createPage(title: string, props: { [key: string]: any }) {
@@ -260,7 +261,6 @@ export class Page implements ZoteroPage {
     } else {
       delete props['alias'];
     }
-    delete props["citationKey"]; // By default, citationKey is not a page property
 
     if (debug_zotero) console.log("in executeImport", props, this.attachments, await this.imported());
     await createPage(this.title, props);
