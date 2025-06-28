@@ -26,7 +26,7 @@ If you are using this plugin for the first time, follow these steps after instal
 
 <details>
   <summary>❗ To enable Zotero-related features </summary>
-<b>For Zotero 7:</b> make sure Zotero is running and turn on `Advanced -> Allow other applications on this computer to communicate with Zotero.
+<b>For Zotero 7:</b> make sure Zotero is running and turn on `Advanced -> Allow other applications on this computer to communicate with Zotero`.
 <hr>
 <b>For Zotero 6:</b> make sure Zotero is running and the plugin [ZotServer](https://github.com/e-zz/ZotServer/) is successfully installed in Zotero following the steps below:
 
