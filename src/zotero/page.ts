@@ -150,6 +150,8 @@ export class Page implements ZoteroPage {
     // create properties that are not in the original item
     props['links'] = `[Local library](zotero://select/library/items/${rawData.key})`;
 
+    if (debug_zotero) console.log("in fromRaw: rawData -> props", props);
+
     let page = new Page(props, attachments, abstract);
     return page;
   }
