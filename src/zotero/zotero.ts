@@ -111,6 +111,8 @@ export class Zotero {
         let itemPage = items.items[i].page;
         let props = itemPage.props;
 
+        console.log("in Zotero.safeImportToCursor\titemPage before:", props);
+
         // Add props['pdfButton'] if the item has attachments
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
           const pdfButtons = [];
