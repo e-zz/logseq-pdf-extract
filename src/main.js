@@ -117,6 +117,15 @@ logseq
       description: 'Set the delay between typing and responsive search (default `100`). Restart or refresh Logseq to take effect.',
       default: '100',
     },
+    // logseq.settings?.zotero_query_params 
+    {
+      key: 'zotero_query_params',
+      type: 'string',
+      inputAs: "textarea",
+      default: "{ qmode: 'everything', itemType: '-attachment', limit: '100' }",
+      title: 'Zotero query parameters',
+      description: 'Set the query parameters for Zotero API requests. The default is `{ qmode: \'everything\', itemType: \'-attachment\', limit: \'100\' }`. You can modify it to fit your needs. For example, you can change `limit` to `20`.',
+    },
     {
       key: 'insert_button',
       type: 'boolean',

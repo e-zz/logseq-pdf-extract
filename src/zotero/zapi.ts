@@ -141,6 +141,22 @@ export class Zapi implements ZoteroAPI {
     }
 }
 
+// Utility to parse settings string to object
+function parseQueryParams(str: string): Record<string, string> {
+    // Example input: "{ qmode: 'everything', itemType: '-attachment', limit: '100' }"
+    // Remove braces and whitespace, split by comma, then by colon
+    return str
+        .replace(/[{}]/g, '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .reduce((acc, pair) => {
+            const [key, value] = pair.split(':').map(x => x.trim().replace(/^'|'$/g, ''));
+            if (key && value) acc[key] = value;
+            return acc;
+        }, {} as Record<string, string>);
+}
+
 export class Zapi7 implements ZoteroAPI {
     // Zotero 7 Local API
     // https://github.com/zotero/zotero/blob/a7778b93e841ce62773efc65cd86576c7bfe8af1/chrome/content/zotero/xpcom/localAPI/server_localAPI.js
@@ -174,11 +190,12 @@ export class Zapi7 implements ZoteroAPI {
     }
 
     async getItem(query: string, options: Record<string, string> = {}): Promise<any> {
+        const settingsString = logseq.settings?.zotero_query_params || "{ qmode: 'everything', itemType: '-attachment', limit: '100' }";
+        const settingsParams = parseQueryParams(settingsString);
+
         const parameters = {
             q: query,
-            qmode: 'everything',
-            itemType: '-attachment',
-            limit: "100",
+            ...settingsParams,
             ...options // Allow overriding defaults
         };
 
@@ -200,7 +217,14 @@ export class Zapi7 implements ZoteroAPI {
     }
 
     async getRecentModified(): Promise<any> {
-        const url = `${Zapi7.API.ITEMS}?itemType=-attachment&sort=dateModified&limit=100`;
+
+        const settingsString = logseq.settings?.zotero_query_params
+        // regex to match limit
+        const limitMatch = settingsString.match(/limit:\s*'(\d+)'/);
+        const limit = limitMatch ? limitMatch[1] : '100'; // Default to 100 if not specified
+
+
+        const url = `${Zapi7.API.ITEMS}?itemType=-attachment&sort=dateModified&limit=${limit}`;
         const res = await Zapi7.CallEndpoint(url);
         // format the response by keeping only the data field
         return res.map((i: any) => i.data);
