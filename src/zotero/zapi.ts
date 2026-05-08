@@ -51,7 +51,8 @@ export class Zapi implements ZoteroAPI {
                 cache: 'no-cache',
                 signal: this.controller.signal,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'zotero-allowed-request': 'true',
                 },
                 body: postData ? JSON.stringify(postData) + '\r\n' : null
             });
@@ -175,7 +176,8 @@ export class Zapi7 implements ZoteroAPI {
                 method: "GET",
                 cache: 'no-cache',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'zotero-allowed-request': 'true',
                 },
             })
                 .then((response) => {
@@ -239,7 +241,9 @@ export class Zapi7 implements ZoteroAPI {
         const attachmentResponse = await fetch(attachmentUrl, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'zotero-allowed-request': 'true',
+
             }
         });
 
