@@ -132,8 +132,10 @@ export class Zotero {
 
       // if (items.items) {
       // 
+      // if items.items is empty iterate items directly
+      const itemsToIterate = items.items && items.items.length > 0 ? items.items : items;
 
-      for (const item of items.items) {
+      for (const item of itemsToIterate) {
         let itemPage = item.page;
         let props = itemPage.props;
 
