@@ -29,7 +29,13 @@ export class Zotero {
   async getByKeys(keys: string[]) {
     let res = await this.api.getItemByKeys(keys);
     if (res) {
+      // FIX: now attachments are also returned in res. Check keys of res and remove attachments.
       res = ZoteroItems.fromRaw(res);
+
+      // Filter out items whose keys or parent keys are not in the input keys list
+      res = res.filter((item: { key: string; parentKey?: string }) =>
+        (item.key && keys.includes(item.key))
+      );
 
       if (debug_zotero) console.log("in Zotero.getByKeys:\t", res);
 
@@ -124,41 +130,51 @@ export class Zotero {
 
       if (debug_zotero) console.log("q_alias", qAlias);
 
-      for (let i = 0; i < items.items.length; i++) {
-        let itemPage = items.items[i].page;
+      // if (items.items) {
+      // 
+
+      for (const item of items.items) {
+        let itemPage = item.page;
         let props = itemPage.props;
 
         // Add props['pdfButton'] if the item has attachments
         if (logseq.settings.insert_button && itemPage.hasAttachment()) {
           const pdfButtons = [];
-          for (let j = 0; j < itemPage.attachments.length; j++) {
-            let atta = itemPage.attachments[j];
-            if (atta.contentType === 'application/pdf') {
-              // Get the button and add to array
-              const button = atta.button || '';
-              if (button) {
-                pdfButtons.push(button);
+          if (itemPage.attachments && itemPage.attachments.length > 0) {
+            for (const atta of itemPage.attachments) {
+              if (atta.contentType === 'application/pdf') {
+                const button = atta.button || '';
+                if (button) {
+                  pdfButtons.push(button);
+                }
               }
             }
           }
+
           // Add the collected PDF buttons to props
           if (pdfButtons.length > 0) {
             props['pdfButton'] = pdfButtons.join(' ');
           }
         }
 
-        // extra props or keys
+        // Extra props or keys
         props['ref'] = itemPage.ref();
-        props['abstract'] = itemPage.abstract;
-        props['year'] = props['date']?.split('-')[0];
+        props['abstract'] = itemPage.abstract || '';
+
+        if (props['date'] && typeof props['date'] === 'string') {
+          props['year'] = props['date'].split('-')[0];
+        } else {
+          props['year'] = '';
+        }
         props['journal'] = props['publication-title'];
 
         if (debug_zotero) console.log("in Zotero.safeImportToCursor\titemPage.props:", props);
 
         let entry = await this.to_cursor_template(props, logseq.settings?.insert_template);
 
-        logseq.Editor.insertAtEditingCursor(entry)
+        logseq.Editor.insertAtEditingCursor(entry);
       }
+      // }
     }
   }
 }
