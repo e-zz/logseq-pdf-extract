@@ -1,3 +1,5 @@
+import { requestJson } from "./request";
+
 export async function readOcr(uuid) {
   // let content = await logseq.Editor.getBlock(uuid);
   let prop = await logseq.Editor.getBlockProperty(uuid, "ocr")
@@ -28,19 +30,17 @@ async function getTexFromHuggingFace(blob) {
   const access_token = logseq.settings!["HuggingFace User Access Token"]
   const image = await blobToBase64(blob);
   const base64Image = image.split(',')[1];
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/Norm/nougat-latex-base",
-    {
-      headers: { Authorization: `Bearer ${access_token}` },
-      method: "POST",
-      body: JSON.stringify({
-        inputs: base64Image,
-        parameters: { max_new_tokens: 1000 }
-      })
-    }
-  );
-
-  const result = await response.json();
+  const result = await requestJson(
+      "https://api-inference.huggingface.co/models/Norm/nougat-latex-base",
+      {
+        headers: { Authorization: `Bearer ${access_token}` },
+        method: "POST",
+        body: {
+          inputs: base64Image,
+          parameters: { max_new_tokens: 1000 }
+        }
+      }
+    );
 
   // If there is an error, wait for the estimated time and retry
   if (result.error) {

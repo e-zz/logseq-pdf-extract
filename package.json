@@ -9,6 +9,7 @@
     "watch": "vite build --watch"
   },
   "dependencies": {
+    "@benjypng/logseq-request": "^1.0.2",
     "@logseq/libs": "^0.3.4",
     "fuse.js": "^6.6.2",
     "vue": "^3.2.33"

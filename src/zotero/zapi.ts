@@ -1,3 +1,5 @@
+import { requestJson } from "../utils/request";
+
 export interface ZoteroAPI {
     BASE_URL: string;
     API_ENDPOINT: string;
@@ -12,8 +14,7 @@ export interface ZoteroAPI {
 export class Zapi implements ZoteroAPI {
     // Adapted from https://github.com/cboulanger/excite-docker/web/web/scripts.js
 
-    static controller: AbortController;
-    BASE_URL = `http://localhost:23119/`;
+        BASE_URL = `http://localhost:23119/`;
     API_ENDPOINT = this.BASE_URL + "zotserver";
     // timeout 2 minutes
     static timeout = 2 * 60 * 1000;
@@ -37,46 +38,37 @@ export class Zapi implements ZoteroAPI {
      */
 
     static async callEndpoint(endpoint: any, postData: any = null) {
-        this.controller = new AbortController();
         this.isTimeout = false;
-        const timeoutFunc = () => {
-            this.isTimeout = true;
-            this.controller.abort();
-        };
-        const id = setTimeout(timeoutFunc, this.timeout);
         let result;
         try {
-            let response = await fetch(endpoint, {
+            result = await requestJson(endpoint, {
                 method: postData ? "POST" : "GET",
-                cache: 'no-cache',
-                signal: this.controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     'zotero-allowed-request': 'true',
                 },
-                body: postData ? JSON.stringify(postData) + '\r\n' : null
+                body: postData ? JSON.stringify(postData) + '\r\n' : undefined,
+                timeoutMs: this.timeout,
             });
-            result = await response.text();
-            if (result.includes("Endpoint")) {
+            // zotserver replies with a text error mentioning the endpoint
+            if (typeof result === "string" && result.includes("Endpoint")) {
                 throw new Error(result.replace("Endpoint", "Endpoint " + endpoint));
             }
-            result = JSON.parse(result);
-            if (result.error) {
+            if (result?.error) {
                 throw new Error(result.error);
             }
             return result;
         } catch (e) {
             console.log(e.message, this.numberTimeouts);
 
-            if (e.message === 'Failed to fetch') {
+            if (e?.message === 'Failed to fetch' || e?.name === 'ProxyUnavailableError') {
                 logseq.UI.showMsg("PDF-Extract: Please run Zotero first. For more info check 👉  https://github.com/e-zz/logseq-pdf-extract#-installation", "warning", { timeout: 8000 })
             }
 
             throw e;
-        } finally {
-            clearTimeout(id);
         }
     }
+
     async search(conditions: any) {
         return await Zapi.callEndpoint(
             this.API.LIBRARY_SEARCH,
@@ -171,23 +163,12 @@ export class Zapi7 implements ZoteroAPI {
     }
 
     static CallEndpoint(url: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            fetch(url, {
-                method: "GET",
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'zotero-allowed-request': 'true',
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => resolve(data))
-                .catch((error) => reject(error));
+        return requestJson(url, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'zotero-allowed-request': 'true',
+            },
         });
     }
 
@@ -238,26 +219,16 @@ export class Zapi7 implements ZoteroAPI {
     }
 
     async getAttachmentByURL(attachmentUrl: string) {
-        const attachmentResponse = await fetch(attachmentUrl, {
+        const attachmentData = await requestJson(attachmentUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'zotero-allowed-request': 'true',
-
             }
         });
-
-        // Parse attachment JSON
-        const attachmentData = await attachmentResponse.json();
         return attachmentData['data'];
     }
 
-    /**
-     * Fetches all attachments for a given parent item by its key
-     * @param key The Zotero item key of the parent item
-     * @returns An array of attachment data objects
-     * @throws Error if the API request fails or returns a non-200 status
-     */
     async getAttachmentsByParentKey(key: string): Promise<any[]> {
         const url = `${Zapi7.API.ITEMS}/${key}/children`;
 
