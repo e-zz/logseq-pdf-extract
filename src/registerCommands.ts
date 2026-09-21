@@ -30,17 +30,18 @@ export async function addPdfExtractSchema() {
   }
 
   // key -> {type, cardinality}. Everything the plugin writes as a property.
-  const dateFields = ["date", "year", "date-added", "date-modified"];
+  // Type assignments follow the proven zoterolocal pattern (works on this graph):
+  //   node+many  for multi-ref fields, date for calendar dates, url for links,
+  //   plain default otherwise (no forced cardinality on default/url).
+  const dateFields = ["date", "date-added", "date-modified"];
   const nodeFieldsMany = ["authors", "tags", "creators"];
   const urlFields = ["url", "doi"];
 
-  const writeField = (key: string) => {
-    let schema;
-    if (dateFields.includes(key)) schema = { type: "date" as const, cardinality: "one" as const };
-    else if (nodeFieldsMany.includes(key)) schema = { type: "node" as const, cardinality: "many" as const };
-    else if (urlFields.includes(key)) schema = { type: "url" as const, cardinality: "one" as const };
-    else schema = { type: "default" as const, cardinality: "one" as const };
-    return logseq.Editor.upsertProperty(key, schema, { name: key });
+  const schemaFor = (key: string) => {
+    if (dateFields.includes(key)) return { type: "date" as const, cardinality: "one" as const };
+    if (nodeFieldsMany.includes(key)) return { type: "node" as const, cardinality: "many" as const };
+    if (urlFields.includes(key)) return { type: "url" as const, cardinality: "one" as const };
+    return { type: "default" as const };
   };
 
   const fields = [
@@ -52,15 +53,34 @@ export async function addPdfExtractSchema() {
     logseq.settings?.prop_name || "pdf-ref",
   ];
 
+  // Idempotent: only create schemas for properties that don't already exist.
+  // Re-upserting an existing typed property can be rejected by the DB worker
+  // (400). Does not change the default-type success path. Mirrors the proven
+  // zoterolocal pattern (getAllProperties → filter existing → create the rest).
+  let existingIdents: Set<string> = new Set();
+  try {
+    const allProps = await logseq.Editor.getAllProperties();
+    existingIdents = new Set((allProps ?? []).map((p: any) => p?.ident).filter(Boolean));
+  } catch (e) {
+    console.warn("[PDF Extract] getAllProperties failed; creating all schemas", e);
+  }
+
+  let created = 0;
   for (const f of fields) {
+    if (existingIdents.has(`:plugin.property.logseq-pdf-extract/${f}`)) {
+      continue; // already bootstrapped, leave untouched
+    }
     try {
-      await writeField(f);
+      await logseq.Editor.upsertProperty(f, schemaFor(f), { name: f });
+      created++;
     } catch (e) {
       console.error(`[PDF Extract] failed to create schema for "${f}"`, e);
     }
   }
-  logseq.UI.showMsg("PDF Extract: DB schema bootstrapped", "info");
-}
+  if (created > 0) {
+    logseq.UI.showMsg(`PDF Extract: DB schema bootstrapped (${created} property${created === 1 ? "" : "s"})`, "info");
+  }
+  }
 
 async function registerShortcuts() {
   logseq.App.registerCommandPalette({
