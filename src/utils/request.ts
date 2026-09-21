@@ -1,4 +1,4 @@
-import { proxy, ProxyUnavailableError } from "@benjypng/logseq-request";
+import { proxy } from "@benjypng/logseq-request";
 
 /**
  * CORS-free HTTP request helper for interactions with the Zotero local API.
@@ -11,24 +11,16 @@ import { proxy, ProxyUnavailableError } from "@benjypng/logseq-request";
  * headers — the origin is the problem, not the headers, and `zotero-allowed-
  * request` (which Zotero's own extension uses) does not help from this origin.
  *
- * The correct route is Logseq's main-process request bridge (`exper_request`
- * / `logseq.Net.request`), proxied through the host's main process which is
- * NOT subject to browser CORS. We require the bridge (per
- * `@benjypng/logseq-request`, proven in the DB build by zoterolocal): if it is
- * unavailable we surface a clear error rather than silently falling back to
- * the CORS-broken `fetch` path.
+ * The correct route is Logseq's main-process request bridge (`logseq.api.exper_request`,
+ * invoked by `@benjypng/logseq-request`), which is NOT subject to browser CORS. We do
+ * NOT probe for the bridge here — `@benjypng/logseq-request` resolves it internally
+ * (there is no `logseq.Net.request` / `logseq.Request.once` global to probe). Bridge
+ * failures surface as `ProxyUnavailableError`, which call sites catch to render a clear
+ * UI message.
  */
 export async function requestJson(url: string, opts: { method?: string; headers?: Record<string, string>; body?: any; timeoutMs?: number } = {}): Promise<any> {
   const method = opts.method || "GET";
   const headers = opts.headers || {};
-
-  const bridgeAvailable =
-    (typeof (logseq as any)?.Net?.request === "function") ||
-    ((logseq as any)?._execCallableAPIAsync && (logseq as any)?.Request?.once);
-
-  if (!bridgeAvailable) {
-    throw new ProxyUnavailableError("no Logseq host request proxy detected");
-  }
 
   let handle = proxy(url).headers(headers);
   if (opts.timeoutMs) handle = handle.timeout(opts.timeoutMs);
