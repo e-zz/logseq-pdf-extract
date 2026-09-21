@@ -19,6 +19,9 @@ function showSearchPanel() {
  * This mirrors zoterolocal's "Add Zotero schema" command: create via
  * Editor.upsertProperty with a sensible type/cardinality for each field the
  * plugin writes. MD graphs have no schema concept, so this is a no-op there.
+ *
+ * Invoked automatically on load (DB graphs only) and on demand via the
+ * "PDF: Add PDF Extract schema to this graph" command.
  */
 export async function addPdfExtractSchema() {
   if (!(await isDbGraph())) {
@@ -45,8 +48,8 @@ export async function addPdfExtractSchema() {
     "original-title", "title", "item-type", "authors", "tags", "citationKey",
     "links", "alias", "year", "journal", "journal-abbreviation", "doi", "url",
     "volume", "issue", "pages", "publisher", "date", "date-added", "date-modified",
-    // extraction (src/utils/extractBlock.ts → setProp) + OCR (src/utils/ocrLib.ts)
-    logseq.settings?.prop_name || "pdf-ref", "ocr",
+    // extraction (src/utils/extractBlock.ts → setProp)
+    logseq.settings?.prop_name || "pdf-ref",
   ];
 
   for (const f of fields) {

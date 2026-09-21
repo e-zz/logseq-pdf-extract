@@ -1,7 +1,7 @@
 import '@logseq/libs'
 import { createApp } from 'vue'
 import { injectAreaHL, changePropsLoad } from './utils/loadObservers'
-import { registerCommands } from './registerCommands'
+import { registerCommands, addPdfExtractSchema } from './registerCommands'
 import App from './App.vue'
 import { DynamicScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
@@ -66,12 +66,15 @@ function main() {
   app.component('DynamicScroller', DynamicScroller)
   app.mount('#app')
 
-
   changePropsLoad();
 
   injectAreaHL();
 
   registerCommands();
+
+  // Auto-bootstrap DB property schema (DB graphs only; no-op on MD graphs).
+  // Idempotent, writes into plugin's own namespace `plugin.property.logseq-pdf-extract/*`.
+  addPdfExtractSchema();
 
   debug_welcome();
 
