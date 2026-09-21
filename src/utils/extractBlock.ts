@@ -1,5 +1,3 @@
-import { readOcr, updateOcr } from "./ocrLib"
-import { wrapAreaIdTex } from "./texLib";
 import { isDbGraph, setProp } from "./graph";
 
 // FIXME : load settings after the plugin is fully initialized
@@ -48,16 +46,14 @@ async function extractRef(uuid) {
   }
 
   const prop = logseq.settings.prop_name;
-  const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
   const ls_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
 
   if (debug_hl) {
     console.log("extract uuid", uuid);
-    console.log("\t hl_type ", hl_type);
     console.log("\t ls_type ", ls_type);
   }
 
-  if (ls_type && !hl_type) {
+  if (ls_type) {
 
     // `((ref))` extraction. On MD graphs the block-ref target property
     // (prop_name) is embedded inline in the block text (`prop:: ((uuid))`), as
@@ -72,14 +68,6 @@ async function extractRef(uuid) {
       prop_uuid = `\n${prop}:: ${ref}\n`
     }
     return { content: prop_uuid + formatStyle(ref_content), propRef: null }
-
-  } else if (hl_type == "area") {
-
-    let prop_ocr = await readOcr(uuid);
-    if (prop_ocr == "") {
-      prop_ocr = await updateOcr(uuid);
-    }
-    return { content: wrapAreaIdTex(prop_ocr, uuid), propRef: null }
 
   }
   return { content: "", propRef: null }

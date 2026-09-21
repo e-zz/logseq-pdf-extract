@@ -1,6 +1,6 @@
 import '@logseq/libs'
 import { createApp } from 'vue'
-import { injectAreaHL, changePropsLoad } from './utils/loadObservers'
+import { changePropsLoad } from './utils/loadObservers'
 import { registerCommands, addPdfExtractSchema } from './registerCommands'
 import App from './App.vue'
 import { DynamicScroller } from 'vue-virtual-scroller'
@@ -67,8 +67,6 @@ function main() {
   app.mount('#app')
 
   changePropsLoad();
-
-  injectAreaHL();
 
   registerCommands();
 
@@ -224,22 +222,6 @@ Journal Abbreviation: {{journal-abbreviation}}`,
       default: "> {{excerpt}}\n\n",
       title: 'Customize the style for your PDF excerpts',
       description: 'Use `{{excerpt}}` as placeholder of your excerpt.',
-    },
-    {
-      key: 'area_style',
-      type: 'string',
-      inputAs: "textarea",
-      default: "((uuid))\n$$tex$$",
-      title: 'Customize style for area OCR results',
-      description: 'Use `tex` as placeholder for OCR results. For example, `$tex$` for inline math. And remove the `((uuid))` placeholder to replace picture with OCR results.',
-    },
-    {
-      key: "HuggingFace User Access Token",
-      type: "string",
-      default: "",
-      title: "HuggingFace User Access Token",
-      description:
-        " Paste your HuggingFace User Access Token. For more information https://huggingface.co/docs/hub/security-tokens",
     },
     {
       key: "PDF Root",
