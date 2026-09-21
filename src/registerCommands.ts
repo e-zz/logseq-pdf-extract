@@ -73,7 +73,7 @@ async function registerShortcuts() {
   logseq.App.registerCommandShortcut(
     {
       binding: logseq.settings.key_search,
-      mode: "editing",
+      mode: "global",
     },
     showSearchPanel
   );
