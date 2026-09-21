@@ -37,7 +37,7 @@ export async function addPdfExtractSchema() {
     else if (nodeFieldsMany.includes(key)) schema = { type: "node" as const, cardinality: "many" as const };
     else if (urlFields.includes(key)) schema = { type: "url" as const, cardinality: "one" as const };
     else schema = { type: "default" as const, cardinality: "one" as const };
-    return logseq.Editor.upsertProperty(key, schema);
+    return logseq.Editor.upsertProperty(key, schema, { name: key });
   };
 
   const fields = [
