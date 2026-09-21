@@ -1,6 +1,7 @@
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user";
 import { Attachment } from "./attachment";
+import { isDbGraph, setProp } from "../utils/graph";
 
 let unwantedKeys;
 function parse_unwantedKeys() {
@@ -57,6 +58,21 @@ const defaultUnwantedKeys = [
 ];
 
 async function createPage(title: string, props: { [key: string]: any }) {
+  const db = await isDbGraph();
+  if (db) {
+    // DB graphs: create the page first (no file-graph `format` option, and the
+    // properties argument does not map to typed DB property entities), then set
+    // each property through the DB API.
+    await logseq.Editor.createPage(title, {}, { redirect: false });
+    const page = await logseq.Editor.getPage(title);
+    if (page?.uuid) {
+      for (const [key, value] of Object.entries(props)) {
+        if (value == null) continue;
+        await setProp(page.uuid, key, value, { reset: true });
+      }
+    }
+    return;
+  }
   await logseq.Editor.createPage(
     title,
     props,
@@ -184,10 +200,16 @@ export class Page implements ZoteroPage {
    * @param alias_key [[citationKey]]
    */
   async updateAlias(page_uuid: string, alias_key: string) {
-    // updateBlock is preferred over upsertBlockProperty due to the reason mentioned in https://plugins-doc.logseq.com/logseq/Editor/upsertBlockProperty
-    // await logseq.Editor.upsertBlockProperty(page.uuid, "alias", alias_key);
-    let pg = await logseq.Editor.getPageBlocksTree(page_uuid);
-    let props: BlockEntity = pg[0];
+      const db = await isDbGraph();
+      if (db) {
+        // DB graphs store alias as a real typed property, not as `alias::` text.
+        await setProp(page_uuid, "alias", alias_key, { reset: true });
+        return;
+      }
+      // updateBlock is preferred over upsertBlockProperty due to the reason mentioned in https://plugins-doc.logseq.com/logseq/Editor/upsertBlockProperty
+      // await logseq.Editor.upsertBlockProperty(page.uuid, "alias", alias_key);
+      let pg = await logseq.Editor.getPageBlocksTree(page_uuid);
+      let props: BlockEntity = pg[0];
 
     let block_content = props.content;
     if (!block_content.includes("alias::")) {
@@ -228,14 +250,8 @@ export class Page implements ZoteroPage {
   }
 
   async create() {
-    await logseq.Editor.createPage(
-      this.title,
-      this.props,
-      {
-        format: logseq.App.getUserConfigs()["prefferedFormat"],
-        redirect: false
-      });
-  }
+      await createPage(this.title, this.props);
+    }
 
   async importAbstract() {
     if (!this.abstract) return;

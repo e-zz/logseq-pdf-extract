@@ -59,10 +59,10 @@ export async function setProp(
     return;
   }
 
-  // MD graph: write `key:: value` as an editor-only line in the first block's text.
-  // Mirrors the existing `updateAlias` text path; see page.ts updateAlias.
-  const pg = await logseq.Editor.getPageBlocksTree(blockOrPageUuid);
-  const block = pg?.[0];
+  // MD graph: write `key:: value` as an editor-only line in the target block's
+  // text. Mirrors the existing `updateAlias` text path (see page.ts). A page
+  // uuid resolves to the page's first block on MD graphs.
+  const block = await logseq.Editor.getBlock(blockOrPageUuid);
   if (!block) return;
 
   let content = block.content;

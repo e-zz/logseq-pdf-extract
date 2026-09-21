@@ -1,5 +1,6 @@
 import { readOcr, updateOcr } from "./ocrLib"
 import { wrapAreaIdTex } from "./texLib";
+import { isDbGraph, setProp } from "./graph";
 
 // FIXME : load settings after the plugin is fully initialized
 async function getContent(ref_id) {
@@ -34,7 +35,7 @@ function formatStyle(excerpt) {
 }
 
 async function extractRef(uuid) {
-  // convert a uuid of annotation to wanted format 
+  // convert a uuid of annotation to wanted format
   let ref_content = await getContent(uuid);
   let ref = `((${uuid}))`;
 
@@ -43,15 +44,10 @@ async function extractRef(uuid) {
     if (debug_hl) {
       console.log(`No valid content for ${uuid}`);
     }
-    return ref
+    return { content: ref, propRef: null }
   }
 
-  let prop_uuid = "";
   const prop = logseq.settings.prop_name;
-  if (prop != "") {
-    prop_uuid = `\n${prop}:: ${ref}\n`
-  }
-
   const hl_type = await logseq.Editor.getBlockProperty(uuid, "hl-type")
   const ls_type = await logseq.Editor.getBlockProperty(uuid, "ls-type")
 
@@ -63,7 +59,19 @@ async function extractRef(uuid) {
 
   if (ls_type && !hl_type) {
 
-    return prop_uuid + formatStyle(ref_content)
+    // `((ref))` extraction. On MD graphs the block-ref target property
+    // (prop_name) is embedded inline in the block text (`prop:: ((uuid))`), as
+    // the original did; on DB graphs it is stored as a real property on the
+    // edited block (set in extractBlock). The replacement content differs
+    // accordingly so MD text behaviour is unchanged.
+    if (await isDbGraph()) {
+      return { content: formatStyle(ref_content), propRef: prop != "" ? ref : null }
+    }
+    let prop_uuid = "";
+    if (prop != "") {
+      prop_uuid = `\n${prop}:: ${ref}\n`
+    }
+    return { content: prop_uuid + formatStyle(ref_content), propRef: null }
 
   } else if (hl_type == "area") {
 
@@ -71,17 +79,17 @@ async function extractRef(uuid) {
     if (prop_ocr == "") {
       prop_ocr = await updateOcr(uuid);
     }
-    return wrapAreaIdTex(prop_ocr, uuid)
+    return { content: wrapAreaIdTex(prop_ocr, uuid), propRef: null }
 
   }
-
+  return { content: "", propRef: null }
 }
 
 const pattern_block_ref = /\(\(([\w-]*?)\)\)/g;
 async function extractBlock(block) {
   // TODO Fix: edge cases of reconstruction of a block containing ref(s)
-  // 1. multiple refs in a block  
-  // 2. DONE ref surrounded by text 
+  // 1. multiple refs in a block
+  // 2. DONE ref surrounded by text
 
   const block_content = block.content;
   if (debug_hl) {
@@ -98,12 +106,27 @@ async function extractBlock(block) {
   // Replace each match in the original string
   let newContent = block_content;
   for (let i = 0; i < matches.length; i++) {
-    newContent = newContent.replace(matches[i][0], replacements[i]);
+    newContent = newContent.replace(matches[i][0], replacements[i].content);
   }
 
   if (debug_hl) { console.log("in ref ", newContent.trim()) }
 
   await logseq.Editor.updateBlock(block.uuid, newContent.trim());
+
+  // Property write for the extracted refs (DB graphs only; on MD graphs the
+  // `prop::` line is already embedded inline in the content above).
+  const db = await isDbGraph();
+  if (db) {
+    const prop = logseq.settings.prop_name;
+    if (prop != "") {
+      const propRefs = replacements
+        .map(r => r.propRef)
+        .filter(r => r != null);
+      if (propRefs.length > 0) {
+        await setProp(block.uuid, prop, propRefs.length > 1 ? propRefs : propRefs[0], { reset: true });
+      }
+    }
+  }
 }
 
 export async function extractEditor() {
