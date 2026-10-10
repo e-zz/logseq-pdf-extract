@@ -84,19 +84,19 @@ export function dbPropValue(key: string, value: any): any {
  * `:logseq.property/deleted-at`).
  *
  * DB graphs keep deleted pages, and `Editor.getPage(name)` still resolves them
- * by name — so every "does this page exist?" test must exclude them. Field name
- * is read tolerantly (`deleted-at` / `deletedAt`, plain or under `properties`)
- * because the plugin API does not declare it in `PageEntity`; an active page
- * carries none of these (checked against live entities on 2.0.2).
+ * by name — so every "does this page exist?" test must exclude them. The plugin
+ * API does not declare the field in `PageEntity`, so any key naming a delete
+ * marker (`deleted-at`, `deletedAt`, `recycle/deleted-at`, …) counts, as long as
+ * it carries a value: an active page has no such marker at all (checked against
+ * live 2.0.2 entities).
  */
 export function isRecycledPage(page: any): boolean {
   if (!page) return false;
-  const marker =
-    page["deleted-at"] ??
-    page.deletedAt ??
-    page.properties?.["deleted-at"] ??
-    page.properties?.deletedAt;
-  return marker != null;
+  const hasMarker = (obj: any) =>
+    !!obj &&
+    typeof obj === "object" &&
+    Object.keys(obj).some((k) => /(^|[./_-])delet/i.test(k) && obj[k] != null);
+  return hasMarker(page) || hasMarker(page.properties);
 }
 
 /**

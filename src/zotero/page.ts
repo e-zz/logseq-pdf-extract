@@ -88,33 +88,53 @@ async function setPageProps(pageUuid: string, title: string, props: { [key: stri
 }
 
 /**
- * Recycle-bin guard for DB graphs.
+ * Resolve the page an import should write into on a DB graph.
  *
  * Logseq keeps deleted pages and still resolves them by name, so a deleted
  * generation of `title` blocks an import: `getPage` reports the page as
- * existing (nothing new is created) and any write lands inside the bin.
- * Put the generation back so the import has a live page to write to.
+ * existing (nothing new is created) and any write lands inside the bin. Ask
+ * Logseq to put the generation back — `restorePage` accepts a page *name*, so
+ * this does not depend on the delete marker being spelled the way
+ * `isRecycledPage` expects.
  *
- * @returns whether the name now belongs to a live page (`true` when there was
- *          nothing to restore). Shows a message when it cannot be restored.
+ * @returns the page entity to import into, and whether it was just restored
+ *          (restored ⇒ the import must repopulate it, not skip it).
  */
+async function lookupPageForImport(title: string): Promise<{ page: any; restored: boolean }> {
+  const first: any = await logseq.Editor.getPage(title);
+  const markerBefore = isRecycledPage(first);
+
+  let page = first;
+  let restored = false;
+
+  if (first == null || markerBefore) {
+    console.info("[PDF Extract] page lookup needs the recycle bin:", {
+      title,
+      lookup: first == null ? null : Object.keys(first),
+      markerDetected: markerBefore,
+    });
+    try {
+      await logseq.Editor.restorePage(title);
+    } catch (e) {
+      console.error(`[PDF Extract] could not restore "${title}" from the recycle bin`, e);
+    }
+    page = await logseq.Editor.getPage(title);
+    restored = page != null && !isRecycledPage(page);
+  }
+
+  return { page, restored };
+}
+
 async function ensurePageIsNotRecycled(title: string): Promise<boolean> {
-  const page: any = await logseq.Editor.getPage(title);
+  const { page, restored } = await lookupPageForImport(title);
   if (!isRecycledPage(page)) return true;
 
-  console.info(`[PDF Extract] "${title}" is in the recycle bin; restoring it`);
-  let restored: any = null;
-  try {
-    restored = await logseq.Editor.restorePage(page.uuid);
-  } catch (e) {
-    console.error(`[PDF Extract] could not restore recycled page "${title}"`, e);
+  if (!restored) {
+    logseq.UI.showMsg(
+      `PDF Extract: "${title}" is in the recycle bin — empty the recycle bin, then import again.`,
+      "warning"
+    );
   }
-  if (restored) return true;
-
-  logseq.UI.showMsg(
-    `PDF Extract: "${title}" is in the recycle bin — empty the recycle bin, then import again.`,
-    "warning"
-  );
   return false;
 }
 
@@ -308,14 +328,19 @@ export class Page implements ZoteroPage {
 
   async imported() {
     // FIXME maybe empty page should be considered as not imported
-    const lsqPage: any = await logseq.Editor.getPage(this.title)
-    if (lsqPage == null) return false;
-    if (!isRecycledPage(lsqPage)) return true;
-    // A page in the recycle bin keeps its name and is still returned by
-    // `getPage`, so it must not count as "already imported": otherwise a
-    // re-import after deleting the page inserts only the cursor template and
-    // never recreates the page. Restoring it lets the import repopulate it.
-    return !(await ensurePageIsNotRecycled(this.title));
+    if (await isDbGraph()) {
+      // A deleted generation keeps its name and is still returned by `getPage`,
+      // so it must not count as "already imported" — otherwise a re-import after
+      // deleting the page inserts only the cursor template and never recreates
+      // the page. `lookupPageForImport` also restores the generation so the
+      // import can repopulate it.
+      const { page, restored } = await lookupPageForImport(this.title);
+      if (page == null) return false;
+      if (restored) return false;
+      return !isRecycledPage(page);
+    }
+    let lsqPage = await logseq.Editor.getPage(this.title)
+    return lsqPage != null;
   }
 
   async create() {
