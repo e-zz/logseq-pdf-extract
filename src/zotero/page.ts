@@ -1,7 +1,7 @@
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user";
 import { Attachment } from "./attachment";
-import { isDbGraph, setProp, dbPropValue } from "../utils/graph";
+import { isDbGraph, setProp, dbPropValue, isRecycledPage } from "../utils/graph";
 
 let unwantedKeys;
 function parse_unwantedKeys() {
@@ -87,17 +87,53 @@ async function setPageProps(pageUuid: string, title: string, props: { [key: stri
   }
 }
 
+/**
+ * Recycle-bin guard for DB graphs.
+ *
+ * Logseq keeps deleted pages and still resolves them by name, so a deleted
+ * generation of `title` blocks an import: `getPage` reports the page as
+ * existing (nothing new is created) and any write lands inside the bin.
+ * Put the generation back so the import has a live page to write to.
+ *
+ * @returns whether the name now belongs to a live page (`true` when there was
+ *          nothing to restore). Shows a message when it cannot be restored.
+ */
+async function ensurePageIsNotRecycled(title: string): Promise<boolean> {
+  const page: any = await logseq.Editor.getPage(title);
+  if (!isRecycledPage(page)) return true;
+
+  console.info(`[PDF Extract] "${title}" is in the recycle bin; restoring it`);
+  let restored: any = null;
+  try {
+    restored = await logseq.Editor.restorePage(page.uuid);
+  } catch (e) {
+    console.error(`[PDF Extract] could not restore recycled page "${title}"`, e);
+  }
+  if (restored) return true;
+
+  logseq.UI.showMsg(
+    `PDF Extract: "${title}" is in the recycle bin — empty the recycle bin, then import again.`,
+    "warning"
+  );
+  return false;
+}
+
 async function createPage(title: string, props: { [key: string]: any }) {
   const db = await isDbGraph();
   if (db) {
-    // DB graphs: create the page first (no file-graph `format` option, and the
-    // properties argument does not map to typed DB property entities), then set
-    // each property through the DB API.
-    await logseq.Editor.createPage(title, {}, { redirect: false });
-    const page = await logseq.Editor.getPage(title);
-    if (page?.uuid) {
-      await setPageProps(page.uuid, title, props);
+    // DB graphs: no file-graph `format` option, and the properties argument does
+    // not map to typed DB property entities — so get-or-create the page and then
+    // set each property through the DB API. Never write into a recycled page.
+    if (!(await ensurePageIsNotRecycled(title))) return;
+    let page: any = await logseq.Editor.getPage(title);
+    if (!page?.uuid) {
+      page = await logseq.Editor.createPage(title, {}, { redirect: false });
     }
+    if (!page?.uuid) {
+      logseq.UI.showMsg(`PDF Extract: could not get a page for "${title}".`, "error");
+      return;
+    }
+    await setPageProps(page.uuid, title, props);
     return;
   }
   await logseq.Editor.createPage(
@@ -272,8 +308,14 @@ export class Page implements ZoteroPage {
 
   async imported() {
     // FIXME maybe empty page should be considered as not imported
-    let lsqPage = await logseq.Editor.getPage(this.title)
-    return lsqPage != null;
+    const lsqPage: any = await logseq.Editor.getPage(this.title)
+    if (lsqPage == null) return false;
+    if (!isRecycledPage(lsqPage)) return true;
+    // A page in the recycle bin keeps its name and is still returned by
+    // `getPage`, so it must not count as "already imported": otherwise a
+    // re-import after deleting the page inserts only the cursor template and
+    // never recreates the page. Restoring it lets the import repopulate it.
+    return !(await ensurePageIsNotRecycled(this.title));
   }
 
   async create() {

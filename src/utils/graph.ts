@@ -80,6 +80,26 @@ export function dbPropValue(key: string, value: any): any {
 }
 
 /**
+ * Whether a page entity is in the recycle bin (Logseq marks it with
+ * `:logseq.property/deleted-at`).
+ *
+ * DB graphs keep deleted pages, and `Editor.getPage(name)` still resolves them
+ * by name — so every "does this page exist?" test must exclude them. Field name
+ * is read tolerantly (`deleted-at` / `deletedAt`, plain or under `properties`)
+ * because the plugin API does not declare it in `PageEntity`; an active page
+ * carries none of these (checked against live entities on 2.0.2).
+ */
+export function isRecycledPage(page: any): boolean {
+  if (!page) return false;
+  const marker =
+    page["deleted-at"] ??
+    page.deletedAt ??
+    page.properties?.["deleted-at"] ??
+    page.properties?.deletedAt;
+  return marker != null;
+}
+
+/**
  * `App.getInfo()` returns a Promise: reading `.supportDb` straight off the call
  * is always falsy, which would silently report a DB graph as a file graph.
  * Fallback for builds without `checkCurrentIsDbGraph`.
