@@ -1,7 +1,7 @@
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user";
 import { Attachment } from "./attachment";
-import { isDbGraph, setProp } from "../utils/graph";
+import { isDbGraph, setProp, dbPropValue } from "../utils/graph";
 
 let unwantedKeys;
 function parse_unwantedKeys() {
@@ -57,6 +57,36 @@ const defaultUnwantedKeys = [
   'citationKey', // citationKey is not a page property by default, but can be used as an alias
 ];
 
+/**
+ * Write every property of a freshly created page on a DB graph.
+ *
+ * Values are passed through `dbPropValue` first (drops empty values, makes
+ * `url`-typed values absolute URLs). Each write is then fired on its own: a
+ * property the DB worker rejects (schema validation, see graph.ts) must not
+ * abort the import, or the page ends up half-populated — every property after
+ * the failing key is lost, along with the abstract/attachment blocks that
+ * `executeImport` would add afterwards. Skipped keys are reported instead.
+ */
+async function setPageProps(pageUuid: string, title: string, props: { [key: string]: any }) {
+  const skipped: string[] = [];
+  for (const [key, value] of Object.entries(props)) {
+    const safeValue = dbPropValue(key, value);
+    if (safeValue === undefined) continue;
+    try {
+      await setProp(pageUuid, key, safeValue, { reset: true });
+    } catch (e) {
+      skipped.push(key);
+      console.error(`[PDF Extract] could not set property "${key}" on "${title}"`, e);
+    }
+  }
+  if (skipped.length > 0) {
+    logseq.UI.showMsg(
+      `PDF Extract: ${skipped.length} propert${skipped.length === 1 ? "y" : "ies"} skipped (${skipped.join(", ")}), see console for details.`,
+      "warning"
+    );
+  }
+}
+
 async function createPage(title: string, props: { [key: string]: any }) {
   const db = await isDbGraph();
   if (db) {
@@ -66,10 +96,7 @@ async function createPage(title: string, props: { [key: string]: any }) {
     await logseq.Editor.createPage(title, {}, { redirect: false });
     const page = await logseq.Editor.getPage(title);
     if (page?.uuid) {
-      for (const [key, value] of Object.entries(props)) {
-        if (value == null) continue;
-        await setProp(page.uuid, key, value, { reset: true });
-      }
+      await setPageProps(page.uuid, title, props);
     }
     return;
   }

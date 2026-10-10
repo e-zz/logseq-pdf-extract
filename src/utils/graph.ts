@@ -1,3 +1,5 @@
+/// <reference types="@logseq/libs" />
+
 /**
  * Graph-type detection + property-write routing.
  *
@@ -15,6 +17,84 @@
 let _isDbGraph: boolean | null = null;
 
 /**
+ * Property keys that are registered as `url`-typed DB properties (see
+ * `addPdfExtractSchema`, which imports this list). The DB worker validates
+ * every value written to them: a string that does not parse as an absolute
+ * URL is rejected at transaction time and the write fails, e.g.
+ *
+ *   Property validation failed: "doi" should be a URL   (value: 10.1103/n7tv-p5bp)
+ *
+ * Zotero stores DOIs bare ("10.1103/n7tv-p5bp") and its local API returns the
+ * raw `url` field as-is, so both must be normalised before writing.
+ */
+export const URL_PROP_KEYS = ["url", "doi"];
+
+/** `doi:`, `https://doi.org/`, `https://dx.doi.org/` prefixes on a DOI value. */
+const DOI_PREFIX = /^(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)/i;
+/** An already-absolute URL carrying an authority (`scheme://…`). */
+const ABSOLUTE_URL = /^[a-z][a-z0-9+.-]*:\/\//i;
+/** Any scheme at all, including authority-less ones (`mailto:`, `data:`, …). */
+const ANY_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+
+/**
+ * Coerce a value into something the DB worker accepts for a `url`-typed
+ * property. Anything already URL-shaped is left alone; the rest gets an
+ * `https://` scheme, because a bare host/path is not parseable as a URL.
+ *
+ * @param opts.doi treat a scheme-less value as a DOI and resolve it via doi.org
+ */
+export function toAbsoluteUrl(value: any, opts: { doi?: boolean } = {}): string {
+  const raw = String(value ?? "").trim();
+  if (raw === "") return "";
+  if (DOI_PREFIX.test(raw)) return `https://doi.org/${raw.replace(DOI_PREFIX, "")}`;
+  if (opts.doi) return `https://doi.org/${raw}`;
+  if (ABSOLUTE_URL.test(raw) || ANY_SCHEME.test(raw)) return raw;
+  return raw.startsWith("//") ? `https:${raw}` : `https://${raw}`;
+}
+
+/**
+ * Turn one Zotero property value into a value the DB API will accept, or
+ * `undefined` when the value carries no information and must not be written.
+ *
+ * Two failure modes are handled here, both seen in the wild:
+ *  - empty value (Zotero omits some fields, returns "" for others): writing it
+ *    produces an empty property at best and an invalid-value error at worst;
+ *  - non-URL value for a `url`-typed property (bare DOI): the write is rejected
+ *    and, without this, aborts the whole import (see `setPageProps`).
+ *
+ * Values of non-URL properties are returned untouched, so what lands on the
+ * page is what Zotero gave us.
+ */
+export function dbPropValue(key: string, value: any): any {
+  if (value == null) return undefined;
+  if (typeof value !== "string") return value;
+
+  const trimmed = value.trim();
+  if (trimmed === "") return undefined;
+
+  if (URL_PROP_KEYS.includes(key)) {
+    const url = toAbsoluteUrl(trimmed, { doi: key === "doi" });
+    return url === "" ? undefined : url;
+  }
+  return value;
+}
+
+/**
+ * `App.getInfo()` returns a Promise: reading `.supportDb` straight off the call
+ * is always falsy, which would silently report a DB graph as a file graph.
+ * Fallback for builds without `checkCurrentIsDbGraph`.
+ */
+async function supportDbFallback(): Promise<boolean> {
+  try {
+    const info = await logseq.App.getInfo?.();
+    return !!(info && (info as any).supportDb);
+  } catch (e) {
+    console.error("[graph] App.getInfo failed", e);
+    return false;
+  }
+}
+
+/**
  * Whether the current graph is a Logseq DB graph (as opposed to a file / MD graph).
  * Result is cached for the session. Falls back to `App.getInfo().supportDb` if
  * `checkCurrentIsDbGraph` is unavailable.
@@ -25,11 +105,11 @@ export async function isDbGraph(): Promise<boolean> {
     if (typeof logseq.App.checkCurrentIsDbGraph === "function") {
       _isDbGraph = !!(await logseq.App.checkCurrentIsDbGraph());
     } else {
-      _isDbGraph = !!(logseq.App.getInfo?.().supportDb);
+      _isDbGraph = await supportDbFallback();
     }
   } catch (e) {
     console.error("[graph] isDbGraph failed, defaulting to supportDb", e);
-    _isDbGraph = !!(logseq.App.getInfo?.().supportDb);
+    _isDbGraph = await supportDbFallback();
   }
   return _isDbGraph;
 }

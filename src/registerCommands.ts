@@ -2,7 +2,7 @@ import { buttonFromClipboard } from "./utils/pdfOpenButton"
 import { importSelectedToCursor } from './zotero/zotero'
 
 import { extractEditor } from "./utils/extractBlock";
-import { isDbGraph } from "./utils/graph";
+import { isDbGraph, URL_PROP_KEYS } from "./utils/graph";
 
 const __debug = false;
 
@@ -33,14 +33,15 @@ export async function addPdfExtractSchema() {
   // Type assignments follow the proven zoterolocal pattern (works on this graph):
   //   node+many  for multi-ref fields, date for calendar dates, url for links,
   //   plain default otherwise (no forced cardinality on default/url).
+  // `url`-typed values are normalised into absolute URLs on write (see
+  // `dbPropValue` in utils/graph.ts) because the DB worker rejects anything else.
   const dateFields = ["date", "date-added", "date-modified"];
   const nodeFieldsMany = ["authors", "tags", "creators"];
-  const urlFields = ["url", "doi"];
 
   const schemaFor = (key: string) => {
     if (dateFields.includes(key)) return { type: "date" as const, cardinality: "one" as const };
     if (nodeFieldsMany.includes(key)) return { type: "node" as const, cardinality: "many" as const };
-    if (urlFields.includes(key)) return { type: "url" as const, cardinality: "one" as const };
+    if (URL_PROP_KEYS.includes(key)) return { type: "url" as const, cardinality: "one" as const };
     return { type: "default" as const };
   };
 
