@@ -152,7 +152,8 @@ logseq
       key: 'insert_template',
       type: 'string',
       inputAs: "textarea",
-      default: `# {{title}}
+      default: `<!-- Default template. Edit it in the plugin settings ("Template for Zotero items") to fit your workflow. -->
+# {{title}}
 
 Metadata
 **Original Title**: {{original-title}}

@@ -195,6 +195,8 @@ If you turn this on, the citation key will be used as the `alias` for an item pa
 
 The template specifying how entries should be imported at cursor. See the [template](https://github.com/e-zz/logseq-pdf-extract/wiki/Template-for-the-%60import-at-cursor%60-function) for more details.
 
+The shipped default is just a starting point: its first line is an HTML comment (`<!-- ... -->`) naming the setting, so the text is self-describing wherever it is inserted. It stays invisible in the rendered page (Logseq injects raw HTML comments) and can be edited or deleted like any other line.
+
 #### `unwanted_keys`
 
 A list of item page property keys that you don't want to import. For example, if you don't want to import `original-title`, then add `original-title` to the list. Separate keys with commas or newlines, like this:
