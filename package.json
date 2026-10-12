@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "watch": "vite build --watch"
+    "watch": "vite build --watch",
+    "verify": "node tests/run.cjs"
   },
   "dependencies": {
     "@benjypng/logseq-request": "^1.0.2",

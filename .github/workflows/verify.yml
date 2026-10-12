@@ -1,0 +1,43 @@
+name: Verify
+
+# Runs on branch pushes and PRs, i.e. BEFORE a release tag is cut: publish.yml only
+# fires on tags, and a tag that produces a failed run is a broken release.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          npm install -g yarn
+          yarn
+
+      # mldoc is the parser Logseq DB graphs use. The template gate asserts the
+      # default template's comment line against it. It is deliberately NOT a
+      # dependency of the plugin (the plugin never calls mldoc): fetch the pinned
+      # tarball into node_modules only, so neither package.json nor the lockfile
+      # changes. Its index.js is self-contained (no requires).
+      - name: Fetch mldoc (pinned, no dependency change)
+        run: |
+          mkdir -p node_modules/mldoc
+          curl -fsSL "$(npm view mldoc@1.5.9 dist.tarball)" | tar -xz --strip-components=1 -C node_modules/mldoc
+
+      # --strict: a skipped layer fails the job. The only layer that can skip is
+      # the mldoc one, so a failed fetch above must not silently pass here.
+      - name: Verify
+        run: yarn verify --strict

@@ -5,5 +5,8 @@ dist-ssr
 *.local
 public
 .*
+# .github is a real, tracked part of the repo: the `.*` rule above would otherwise
+# hide any NEW file in it (verify.yml was invisible to git until this line existed)
+!.github/
 # local decision-tree journal (dt) — machine-local, never commit
 dt.db*
