@@ -20,7 +20,8 @@ And [more features](#possible-improvements) are planned. PRs are welcome!
 
 | Release | Graph support                    | Zotero | OCR |
 | ------- | -------------------------------- | ------ | --- |
-| v0.4.0 (latest) | DB graph only (Markdown/Org removed) | Yes   | Removed |
+| v0.4.1 (latest) | DB graph only (Markdown/Org removed) | Yes   | Removed |
+| v0.4.0  | DB graph only (Markdown/Org removed) | Yes   | Removed |
 | v0.3.0  | File-based (Markdown / Org)      | Yes    | Yes |
 
 ## 🛠 Installation
