@@ -5,3 +5,5 @@ dist-ssr
 *.local
 public
 .*
+# local decision-tree journal (dt) — machine-local, never commit
+dt.db*
